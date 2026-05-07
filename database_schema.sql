@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS Players (
     PlayerName TEXT NOT NULL UNIQUE,
     CreatedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     LastPlayedDate DATETIME,
-    IsActive INTEGER DEFAULT 1
+    IsActive INTEGER DEFAULT 1,
+    FleetLevel INTEGER NOT NULL DEFAULT 1,
+    FleetXP INTEGER NOT NULL DEFAULT 0
 );
 
 -- Player Statistics Table
@@ -110,6 +112,21 @@ CREATE TABLE IF NOT EXISTS PlayerAchievements (
     UnlockedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (PlayerID) REFERENCES Players(PlayerID) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS ShipUnlockRequirements (
+    ShipType TEXT PRIMARY KEY,   -- e.g. 'Carrier', 'Destroyer'
+    RequiredLevel INTEGER NOT NULL,
+    DisplayName TEXT NOT NULL,
+    Description TEXT
+);
+-- Seed data: the actual unlock thresholds
+INSERT INTO ShipUnlockRequirements (ShipType, RequiredLevel, DisplayName, Description) VALUES
+    ('Sloop',        1,  'Sloop',            'Available from the start'),
+    ('Brig',         1,  'Brig',             'Available from the start'),
+    ('Frigate',      3,  'Frigate',          'Unlock at Fleet Level 3'),
+    ('ManOWar',      5,  'Man-O-War',        'Unlock at Fleet Level 5'),
+    ('Carrier',      7,  'Carrier',          'Unlock at Fleet Level 7'),
+    ('Ironclad',     6,  'Ironclad',         'Unlock at Fleet Level 6');
 
 -- Create Indexes for faster queries
 CREATE INDEX IF NOT EXISTS idx_players_name ON Players(PlayerName);

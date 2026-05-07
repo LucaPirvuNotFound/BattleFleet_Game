@@ -446,6 +446,60 @@ namespace BattleFleet.Tests
                 Debug.Log($"\n✗ {testRunCount - testPassCount} tests failed. Review the log above.");
             }
         }
+
+        // ── Ship Unlock Tests ──────────────────────────────────────────────────────
+
+        [Test]
+        public void ShipUnlock_StarterShipsAvailableAtLevel1()
+        {
+            var repo     = new ShipUnlockRepository(_db);
+            int playerId = CreateTestPlayerAtLevel(1);
+
+            Assert.IsTrue(repo.IsShipUnlocked(playerId, "Sloop"),   "Sloop should be unlocked at level 1");
+            Assert.IsTrue(repo.IsShipUnlocked(playerId, "Brig"),    "Brig should be unlocked at level 1");
+            Assert.IsFalse(repo.IsShipUnlocked(playerId, "Carrier"),"Carrier should NOT be unlocked at level 1");
+        }
+
+        [Test]
+        public void ShipUnlock_CarrierUnlocksAtLevel7()
+        {
+            var repo     = new ShipUnlockRepository(_db);
+            int playerId = CreateTestPlayerAtLevel(6);
+            Assert.IsFalse(repo.IsShipUnlocked(playerId, "Carrier"), "Carrier locked at level 6");
+
+            SetPlayerLevel(playerId, 7);
+            Assert.IsTrue(repo.IsShipUnlocked(playerId, "Carrier"),  "Carrier unlocked at level 7");
+        }
+
+        [Test]
+        public void Progression_XpAwardIncreasesLevel()
+        {
+            var statsRepo = new PlayerStatsRepository(_db);
+            int playerId  = CreateTestPlayerAtLevel(1);
+
+            // Level 2 requires 100 XP total
+            int newLevel = statsRepo.AwardXpAndLevelUp(playerId, 100);
+            Assert.AreEqual(2, newLevel, "Should be level 2 after 100 XP");
+        }
+
+        // helpers
+        private int CreateTestPlayerAtLevel(int level)
+        {
+            // insert a test player row with fleet_level = level, fleet_xp = 0
+            // adapt to your existing player creation method
+            throw new System.NotImplementedException("Wire up to your PlayerRepository");
+        }
+
+        private void SetPlayerLevel(int playerId, int level)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "UPDATE players SET fleet_level = @l WHERE id = @id;";
+            cmd.Parameters.AddWithValue("@l",  level);
+            cmd.Parameters.AddWithValue("@id", playerId);
+            cmd.ExecuteNonQuery();
+        }
     }
 
     // ==================== MANUAL TESTING CHECKLIST ====================

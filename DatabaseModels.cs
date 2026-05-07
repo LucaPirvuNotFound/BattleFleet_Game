@@ -14,6 +14,8 @@ namespace BattleFleet.Database
         public DateTime CreatedDate { get; set; }
         public DateTime? LastPlayedDate { get; set; }
         public bool IsActive { get; set; }
+        public int FleetLevel { get; set;}
+        public int FleetXP { get; set;}
 
         public Player()
         {
@@ -176,5 +178,30 @@ namespace BattleFleet.Database
             SaveDate = DateTime.Now;
             IsActive = true;
         }
+    }
+
+    // Represents a row in ship_unlock_requirements
+    [System.Serializable]
+    public class ShipUnlockRequirement
+    {
+        public string ShipType       { get; set; }
+        public int    RequiredLevel  { get; set; }
+        public string DisplayName    { get; set; }
+        public string Description    { get; set; }
+    }
+
+    // Lightweight result used by UI to check unlock status
+    [System.Serializable]
+    public class ShipUnlockStatus
+    {
+        public string ShipType      { get; set; }
+        public string DisplayName   { get; set; }
+        public int    RequiredLevel { get; set; }
+        public bool   IsUnlocked    { get; set; }
+        public string Description   { get; set; }
+
+        // Convenience string for UI display
+        public string UnlockLabel =>
+            IsUnlocked ? "Unlocked" : $"Requires Fleet Level {RequiredLevel}";
     }
 }

@@ -490,5 +490,88 @@ namespace BattleFleet.Database
                 return false;
             }
         }
+
+        // ── XP & Levelling ─────────────────────────────────────────────────────────
+        /// <summary>
+        /// Awards XP to a player after a match and handles level-up automatically.
+        /// Call this at the end of every game.
+        /// Returns the new level (useful to trigger a level-up animation in Unity).
+        /// </summary>
+        public int AwardXpAndLevelUp(int playerId, int xpGained)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            // 1. Read current state
+            using var selectCmd = conn.CreateCommand();
+            selectCmd.CommandText = "SELECT fleet_level, fleet_xp FROM players WHERE id = @id;";
+            selectCmd.Parameters.AddWithValue("@id", playerId);
+
+            int currentLevel, currentXp;
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                reader.Read();
+                currentLevel = reader.GetInt32(0);
+                currentXp    = reader.GetInt32(1);
+            }
+
+            // 2. Calculate new XP and level
+            int newXp    = currentXp + xpGained;
+            int newLevel = CalculateLevel(newXp);     // see formula below
+
+            // 3. Persist
+            using var updateCmd = conn.CreateCommand();
+            updateCmd.CommandText = @"
+                UPDATE players
+                SET fleet_xp    = @xp,
+                    fleet_level = @level
+                WHERE id = @id;";
+            updateCmd.Parameters.AddWithValue("@xp",    newXp);
+            updateCmd.Parameters.AddWithValue("@level",  newLevel);
+            updateCmd.Parameters.AddWithValue("@id",     playerId);
+            updateCmd.ExecuteNonQuery();
+
+            return newLevel;
+        }
+
+        /// <summary>
+        /// XP formula: each level requires 100 * level XP on top of the previous.
+        /// Level 1 = 0 XP, Level 2 = 100, Level 3 = 300, Level 4 = 600 …
+        /// Easy to swap out for any curve you like.
+        /// </summary>
+        public static int CalculateLevel(int totalXp)
+        {
+            int level = 1;
+            int xpNeeded = 0;
+            while (totalXp >= xpNeeded + (level * 100))
+            {
+                xpNeeded += level * 100;
+                level++;
+            }
+            return level;
+        }
+
+        /// <summary>Returns XP needed to reach the next level (for the progress bar).</summary>
+        public (int currentXp, int xpForCurrentLevel, int xpForNextLevel) GetProgressBarData(int playerId)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT fleet_xp, fleet_level FROM players WHERE id = @id;";
+            cmd.Parameters.AddWithValue("@id", playerId);
+
+            using var reader = cmd.ExecuteReader();
+            reader.Read();
+            int totalXp = reader.GetInt32(0);
+            int level   = reader.GetInt32(1);
+
+            // XP thresholds for current level band
+            int xpStart = 0;
+            for (int l = 1; l < level; l++) xpStart += l * 100;
+            int xpEnd = xpStart + level * 100;
+
+            return (totalXp, xpStart, xpEnd);
+        }
     }
 }
