@@ -46,3 +46,98 @@ Assistant response summary:
 If you want a more detailed transcript (including exact verbatim text of every assistant message and every intermediate status update), say so and I will append the full conversation log below this summary.
 
 Files referenced above are in the workspace root `c:\Users\User\mds_lore`. To open the main integration guide, see [SETUP_GUIDE.md](SETUP_GUIDE.md).
+
+**Prompt 3 (Gemini)**
+"Vreau sa imi dai un prompt detaliat, pe care un ai pentru generarea diagramelor UML ar putea sa il parcurga cu precizie, in engleza, fara sa omiti niciun detaliu pe care ti l-am dat de- a lungul conversatiei. Vreau sa folosesc mermaid.ai pentru generarea celor 3 tipuri de diagrame UML. te rog sa ai grija sa incluzi: toate cele 5 modele precizate in partea de databases, toate navele care s-ar deriva din Ship cu echipamentul corespunzator, conform listei, tot ce se afla in schemas.py si modalitatea prin care vrem noi sa functioneze legatura intre Unity si python, exact cum a descris-o colegul meu prin folosirea fisierelor de tip json"
+
+Assistant response summary:
+- **Action**: Created the requested prompt: 
+"The Mermaid.ai Master Prompt
+Role: You are an expert Software Architect and Mermaid.js specialist.
+Task: Generate three distinct Mermaid.js diagrams (Class, Sequence, and Activity) for a turn-based naval game project ("Battle Fleet 2" style) developed in Unity (C#), Python (FastAPI), and SQLite.
+
+1. Class Diagram Specifications:
+Include the following three logical modules:
+
+Database Models (C# / SQLite):
+
+Player: int PlayerID, string PlayerName, DateTime CreatedDate, DateTime? LastPlayedDate, bool IsActive.
+
+PlayerStats: int StatID, int PlayerID, int Level, int TotalExperience, int TotalBattles, int TotalWins, int TotalLosses, int TotalDraws, double AverageAccuracy, int TotalShipsDestroyed, int TotalShipsLost, double CampaignProgressPercentage, int HighestLevel, DateTime LastUpdated.
+
+Captain: int CaptainID, int PlayerID, string CaptainName, int ExperiencePoints, int Level, string SpecializationClass (General/Aggressive/Defensive/Scout), int BattlesParticipated, bool IsAvailable.
+
+BattleRecord: int BattleID, int PlayerID, string OpponentName, DateTime BattleDate, string Result, int ShipsDestroyed, int ShipsLost, int ExperienceGained, string DifficultyLevel, string BattleMode.
+
+CampaignSave: int SaveID, int PlayerID, string CampaignName, int CurrentTurn, int TerritoryControlled, int ResourcePoints, string EnemyFaction, string DifficultyLevel, DateTime SaveDate.
+
+Ship Hierarchy (Unity Entities):
+
+Base Class Ship: Health, Speed, List<Weapon> Armament.
+
+Battleship: 12,000hp, 22 knots. Armament: 3 heavy turrets, 4 light turrets, 2 torpedo launchers, recon planes.
+
+Cruiser: 9,000hp, 30 knots. Armament: 3 medium turrets, 4 light turrets, 2 torpedo launchers.
+
+Destroyer: 4,000hp, 35 knots. Armament: 1 medium turret, 8 light turrets, 6 torpedo launchers.
+
+Corvette: 1,750hp, 35 knots. Armament: 7 light turrets, 4 torpedo launchers.
+
+Torpedo Boat: 300hp, 45 knots. Armament: 1 light turret, 1 torpedo launcher.
+
+API Schemas (Pydantic/FastAPI):
+
+Vec3: float x, y, z.
+
+Environment: float gravity (default 9.81).
+
+GameState: Vec3 ai_ship_position, Vec3 target_ship_position, Environment environment.
+
+ShootAction: string action="shoot", float angle_horizontal, float angle_vertical, float power.
+
+2. Sequence Diagram Specifications:
+Visualize the "AI Turn" interaction:
+
+Actors: Unity Client, FastAPI Backend, SQLite Database.
+
+Process:
+
+Unity Client serializes GameState into a JSON package.
+
+Unity sends JSON via HTTP POST to the Python FastAPI backend.
+
+Python (physics.py) runs the ballistic solver (compute_minimum_speed_ballistic).
+
+Python returns a JSON response (ShootAction) containing angles and power.
+
+Unity receives JSON and executes the shot animation.
+
+Unity triggers an immediate Database Save after the action to update BattleRecord, PlayerStats, and CampaignSave.
+
+3. Activity Diagram Specifications:
+Visualize the "Game Loop Logic":
+
+Nodes: Start Turn -> Check if Active Player is AI or Human.
+
+AI Path: Request AI strategy (FastAPI) -> Receive Decision -> Display Strategy text/voice on screen (Spectator Mode logic) -> Execute Move/Shot.
+
+Human Path: Wait for UI Input -> Execute Move/Shot.
+
+Shared Path: Calculate Hit/Miss -> Update SQLite Database (Persistent Save) -> Check for Game Over.
+
+End Path: Update CampaignSave (Territory/Resources) and PlayerStats (XP/Level).
+
+Output Format: Provide three separate code blocks in Mermaid.js syntax."
+
+
+**Prompt 4(Claude)**
+"My role is to work on the database connection, storyng player users and their stats, the leveling up logic. I'll user SQLLite and unity and my first task was the following. create the databases in sqlite locally and write the queries (CRUD) for creati8ng a new player and save their name, independently from the game.  Now my branch hierarchy looks like this: 1. database_schema.sql              (SQL Database Schema) ├── 2. DatabaseModels.cs                (C# Model Classes) ├── 3. DatabaseManager.cs               (Connection Management) ├── 4. PlayerRepository.cs              (CRUD Operations - Players) ├── 5. PlayerStatsRepository.cs         (Statistics & Progression) ├── 6. DatabaseUsageExample.cs          (6 Practical Examples) ├── 7. DatabaseTests.cs                 (Unit Tests & Validation) ├── 8. SETUP_GUIDE.md                   (Installation Instructions) ├── 9. README.md                        (Project Overview) └── 10. PROJECT_STRUCTURE.md            (This File). My next task is the following: Progression bar, and the user story related to this one is the following: As a player, when my fleet reaches a certain level, I want to unlock advanced ships like Carriers so that I can enhance my gameplay experience.
+Context
+Players currently have access to advanced ships without fleet level restrictions. This change aims to create a more engaging progression system.
+Acceptance criteria
+
+Players can only unlock advanced ships like Carriers after reaching a specified fleet level.
+The required fleet level for unlocking advanced ships should be clearly displayed in the game. Think deeply and write me exactly what I should add, where and the piece of code that i need to integer in the project, if i need a separeate file or anything else"
+
+Assistant response summary:
+- **Action**: Highlighted the adds needed to the existing files and creating 2 new files:  ShipUnlockRepository.cs and ProgressionBarUI.cs.
