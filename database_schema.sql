@@ -42,7 +42,37 @@ CREATE TABLE IF NOT EXISTS Captains (
     BattlesParticipated INTEGER DEFAULT 0,
     CreatedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     IsAvailable INTEGER DEFAULT 1,
+    AccuracyBonus REAL DEFAULT 0.0, -- percentage bonus to shot accuracy, earned via XP
     FOREIGN KEY (PlayerID) REFERENCES Players(PlayerID) ON DELETE CASCADE
+);
+
+-- Command Cards Table (definitions - static reference data)
+CREATE TABLE IF NOT EXISTS CommandCards (
+    CardID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CardName TEXT NOT NULL UNIQUE,
+    Description TEXT,
+    RequiredCaptainLevel INTEGER NOT NULL DEFAULT 1,
+    AccuracyBonus REAL DEFAULT 0.0, -- additional accuracy bonus this card grants
+    CardType TEXT DEFAULT 'Tactical' -- Tactical, Offensive, Defensive
+);
+
+-- Seed the available command cards (one card unlocked per captain level)
+INSERT OR IGNORE INTO CommandCards (CardName, Description, RequiredCaptainLevel, AccuracyBonus, CardType) VALUES
+    ('Steady Aim',         'The captain steadies the crew''s aim, reducing spread. +3% accuracy.',               1, 3.0, 'Tactical'),
+    ('Broadside Volley',   'Orders all cannons to fire simultaneously for maximum impact.',                      2, 0.0, 'Offensive'),
+    ('Evasive Maneuvers',  'Directs the ship to weave through fire, reducing incoming hit chance.',              3, 0.0, 'Defensive'),
+    ('Suppressing Fire',   'Sustained fire disrupts the enemy crew''s targeting for one turn.',                  4, 0.0, 'Offensive'),
+    ('Admiral''s Command', 'A masterful tactical order that boosts the entire crew''s performance. +5% accuracy.', 5, 5.0, 'Tactical');
+
+-- Captain Command Cards Junction Table (tracks which captains have unlocked which cards)
+CREATE TABLE IF NOT EXISTS CaptainCommandCards (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CaptainID INTEGER NOT NULL,
+    CardID INTEGER NOT NULL,
+    UnlockedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(CaptainID, CardID),
+    FOREIGN KEY (CaptainID) REFERENCES Captains(CaptainID) ON DELETE CASCADE,
+    FOREIGN KEY (CardID) REFERENCES CommandCards(CardID) ON DELETE CASCADE
 );
 
 -- Ships Owned by Player Table
@@ -137,3 +167,4 @@ CREATE INDEX IF NOT EXISTS idx_shipweapons_shipid ON ShipWeapons(ShipID);
 CREATE INDEX IF NOT EXISTS idx_campaignsaves_playerid ON CampaignSaves(PlayerID);
 CREATE INDEX IF NOT EXISTS idx_battlehistory_playerid ON BattleHistory(PlayerID);
 CREATE INDEX IF NOT EXISTS idx_achievements_playerid ON PlayerAchievements(PlayerID);
+CREATE INDEX IF NOT EXISTS idx_captaincommandcards_captainid ON CaptainCommandCards(CaptainID);

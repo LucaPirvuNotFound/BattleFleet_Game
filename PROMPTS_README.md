@@ -47,6 +47,25 @@ If you want a more detailed transcript (including exact verbatim text of every a
 
 Files referenced above are in the workspace root `c:\Users\User\mds_lore`. To open the main integration guide, see [SETUP_GUIDE.md](SETUP_GUIDE.md).
 
+---
+
+**Prompt 5 (Claude)**
+"in the current project, the following task is the following: levelling up: as a player when i engage in battles, i want my captain to gain xp so that they can unlock 'command cards' or improve their accuracy. this issue relates to the gameplay mechanics of a battle system. players want to enhance their captains abilities through experience points gained in battles. Acceptance criteria: captain should gain xp after each battle. xp should contribute towards unlocking command cards. improved accuracy should be a measurable outcome of gained xp. I want you to edit the files in order to respect the task, but keep the structure. take notice that i had a task progression bar in which i might have already implemented some levelling logic. add the prompt in the prompts readme"
+
+Assistant response summary:
+- **Action**: Implemented the full captain levelling feature across the database layer, keeping the existing project structure intact.
+- **Files modified**:
+  - [database_schema.sql](database_schema.sql) — Added `AccuracyBonus` column to `Captains` table; added `CommandCards` table (seeded with 5 cards, one per level); added `CaptainCommandCards` junction table and its index.
+  - [DatabaseModels.cs](DatabaseModels.cs) — Added `AccuracyBonus` property to `Captain`; added `CommandCard` model; added `CaptainCommandCard` model.
+- **Files created**:
+  - [CaptainRepository.cs](CaptainRepository.cs) — New repository following the existing `PlayerStatsRepository` pattern with: `GetCaptain`, `GetCaptainsByPlayer`, `CreateCaptain`, `AwardBattleXp` (Win +150 XP, Loss +50, Draw +75, +25 per ship destroyed), `GetCaptainAccuracyBonus`, `GetAllCommandCards`, `GetUnlockedCommandCards`.
+- **Key design decisions**:
+  - XP curve mirrors `PlayerStatsRepository.CalculateLevel`: each level costs `level * 100` XP (Level 2 = 100 XP, Level 3 = 300, Level 4 = 600 …).
+  - Accuracy bonus formula: `(captainLevel - 1) * 2%` (measurable, persisted in DB as `AccuracyBonus`).
+  - One command card unlocks per captain level (Steady Aim at L1, Broadside Volley at L2, Evasive Maneuvers at L3, Suppressing Fire at L4, Admiral's Command at L5).
+  - `UnlockEligibleCommandCards` uses `INSERT OR IGNORE` so it is safe to call on every level-up without creating duplicates.
+  - All queries use parameterized statements (no SQL injection risk).
+
 **Prompt 3 (Gemini)**
 "Vreau sa imi dai un prompt detaliat, pe care un ai pentru generarea diagramelor UML ar putea sa il parcurga cu precizie, in engleza, fara sa omiti niciun detaliu pe care ti l-am dat de- a lungul conversatiei. Vreau sa folosesc mermaid.ai pentru generarea celor 3 tipuri de diagrame UML. te rog sa ai grija sa incluzi: toate cele 5 modele precizate in partea de databases, toate navele care s-ar deriva din Ship cu echipamentul corespunzator, conform listei, tot ce se afla in schemas.py si modalitatea prin care vrem noi sa functioneze legatura intre Unity si python, exact cum a descris-o colegul meu prin folosirea fisierelor de tip json"
 

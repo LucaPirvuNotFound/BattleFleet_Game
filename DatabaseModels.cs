@@ -91,6 +91,8 @@ namespace BattleFleet.Database
         public int BattlesParticipated { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsAvailable { get; set; }
+        // Accuracy bonus in percentage points, derived from captain level (Level-1)*2%
+        public double AccuracyBonus { get; set; }
 
         public Captain()
         {
@@ -98,6 +100,7 @@ namespace BattleFleet.Database
             IsAvailable = true;
             CreatedDate = DateTime.Now;
             SpecializationClass = "General";
+            AccuracyBonus = 0.0;
         }
 
         public Captain(string captainName, string specialization = "General")
@@ -107,7 +110,40 @@ namespace BattleFleet.Database
             IsAvailable = true;
             CreatedDate = DateTime.Now;
             SpecializationClass = specialization;
+            AccuracyBonus = 0.0;
         }
+    }
+
+    /// <summary>
+    /// Command card definition - a tactical ability unlocked by a captain at a certain level
+    /// </summary>
+    [System.Serializable]
+    public class CommandCard
+    {
+        public int CardID { get; set; }
+        public string CardName { get; set; }
+        public string Description { get; set; }
+        public int RequiredCaptainLevel { get; set; }
+        // Additional accuracy bonus granted when this card is in use
+        public double AccuracyBonus { get; set; }
+        public string CardType { get; set; } // Tactical, Offensive, Defensive
+
+        public override string ToString()
+        {
+            return $"[Lvl {RequiredCaptainLevel}] {CardName} ({CardType}) — {Description}";
+        }
+    }
+
+    /// <summary>
+    /// Tracks which command cards a captain has unlocked
+    /// </summary>
+    [System.Serializable]
+    public class CaptainCommandCard
+    {
+        public int ID { get; set; }
+        public int CaptainID { get; set; }
+        public int CardID { get; set; }
+        public DateTime UnlockedDate { get; set; }
     }
 
     /// <summary>
