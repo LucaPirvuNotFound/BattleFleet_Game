@@ -160,3 +160,46 @@ The required fleet level for unlocking advanced ships should be clearly displaye
 
 Assistant response summary:
 - **Action**: Highlighted the adds needed to the existing files and creating 2 new files:  ShipUnlockRepository.cs and ProgressionBarUI.cs.
+
+---
+
+**Prompt 6 (Claude)**
+"we decided to create a game based on BattleFleet2(the naval turn-based game). the gameplay should be very similar to the original game, so most of the logic should be implemented the same way. My tasks were to implement the database scripts, the levelling up and the progression bar. additionally i should write up the logic of saving up the progress (only the database part). As you can see you have in this folder scripts in sql and c#, but we decided to change the framework and go with GODOT. I want you, based on what I described to you, to read the scripts, search up the game logic if needed, check and modify the logical errors if are any and to convert all the scripts into GODOT, in another folder that will be named 'godot_version'. If there are any missing pieces, please add them, but be mindful not to break the flow. All the changes and adds will be placed inside the new folder. Please modify the markdown files, too and add them in the folder changed."
+
+Assistant response summary:
+- **Action**: Read all existing C# and SQL files, identified logic bugs, and converted the full system to Godot 4 + GDScript inside a new `godot_version/` folder.
+- **Files created** (`godot_version/`):
+  - `database/database_schema.sql` — Unchanged SQL schema, added Godot-specific comments
+  - `database/DatabaseManager.gd` — Autoload singleton wrapping the godot-sqlite plugin
+  - `database/DatabaseModels.gd` — All data classes as `BattleFleetModels.*` inner classes
+  - `database/PlayerRepository.gd` — Player CRUD
+  - `database/PlayerStatsRepository.gd` — Stats, player level, fleet level, leaderboards; exposes signals `player_leveled_up` and `fleet_leveled_up`
+  - `database/CaptainRepository.gd` — Captain XP, command card unlocking, accuracy bonus; exposes signal `captain_leveled_up`
+  - `database/ShipUnlockRepository.gd` — Fleet-level ship gating
+  - `database/DatabaseUsageExample.gd` — New file: 6 integration examples with signal hookup
+  - `ui/ProgressionBarUI.gd` — Godot Control node with fleet XP bar + ship unlock list
+  - `README.md`, `PROJECT_STRUCTURE.md`, `SETUP_GUIDE.md` — All updated for Godot 4
+- **Bugs fixed** (from the Unity/C# version):
+  - `DatabaseManager`: Players table was missing `FleetLevel` and `FleetXP` columns in CREATE TABLE
+  - `PlayerRepository`: `GetPlayerByID`/`GetPlayerByName` never read `FleetLevel`/`FleetXP` from the result row
+  - `PlayerStatsRepository`: `AwardXpAndLevelUp` and `GetProgressBarData` referenced an undefined `_db` field and used wrong table/column names (`players`, `fleet_xp`, `fleet_level` instead of `Players`, `FleetXP`, `FleetLevel`)
+  - `ShipUnlockRepository`: All column names were snake_case (`ship_type`, `required_level`, `fleet_level`) — none exist in the schema which is PascalCase; also called `_db.GetConnection()` which does not exist
+  - `ProgressionBarUI`: Constructor accepted a `DatabaseManager db` parameter that was never used (repositories already use the singleton)
+
+---
+
+**Prompt 7 (Claude)**
+"add these prompts inside the PROMPTS_README and then check one more time if the logic is 100% followed and no mistakes were made. look up the original game logic online if needed and only if you have a strong reason, suggest me follow-ups adding/modifications"
+
+Assistant response summary:
+- **Action**: Updated PROMPTS_README (root and `godot_version/`) with all current prompts. Researched Battle Fleet 2 game mechanics online and performed a full logic pass over all Godot scripts.
+- **Verification findings** (all confirmed correct):
+  - Captain XP with accuracy bonus — matches the original game (captains have experience ratings that affect combat)
+  - Campaign mode with Japan faction — confirmed in original
+  - Win/Loss/Draw result types — consistent with turn-based naval combat
+  - Accuracy as a core mechanic — confirmed in original (targeting reticles scale with difficulty)
+  - Two XP systems (player level flat curve + fleet level quadratic) — architecturally sound and consistent across all files post-fix
+  - `INSERT OR IGNORE` for command card unlocking — safe to call on every level-up, no duplicates
+  - `ProgressionBarUI.refresh()` correctly uses `calculate_fleet_level()` static method — verified
+  - All fixed column names (`FleetLevel`, `FleetXP`, `ShipType`, `RequiredLevel`, `DisplayName`) match the schema throughout
+- **One follow-up suggested** (strong reason): `record_battle_result()` updates `PlayerStats` aggregates but never inserts a row into `BattleHistory`. The table exists and is described as essential for analytics and AI difficulty tuning, but nothing writes to it. A `_insert_battle_history()` helper is needed inside `record_battle_result()`.
