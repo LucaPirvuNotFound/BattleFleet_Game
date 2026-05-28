@@ -14,9 +14,7 @@ class Player:
 	var created_date: String = ""
 	var last_played_date: String = ""
 	var is_active: bool = true
-	## Separate from player stats Level — gates ship unlocks via ShipUnlockRequirements
-	var fleet_level: int = 1
-	var fleet_xp: int = 0
+	var elo: int = 0
 
 	func _init(p_name: String = "") -> void:
 		player_name = p_name
@@ -24,7 +22,7 @@ class Player:
 		created_date = Time.get_datetime_string_from_system()
 
 	func _to_string() -> String:
-		return "Player: %s (ID: %d) | Fleet Lvl %d" % [player_name, player_id, fleet_level]
+		return "Player: %s (ID: %d)" % [player_name, player_id]
 
 
 # ── PlayerStats ───────────────────────────────────────────────────────────────
@@ -32,9 +30,6 @@ class Player:
 class PlayerStats:
 	var stat_id: int = 0
 	var player_id: int = 0
-	## Overall player level derived from TotalExperience (flat 1000 XP/level curve)
-	var level: int = 1
-	var total_experience: int = 0
 	var total_battles: int = 0
 	var total_wins: int = 0
 	var total_losses: int = 0
@@ -42,13 +37,24 @@ class PlayerStats:
 	var average_accuracy: float = 0.0
 	var total_ships_destroyed: int = 0
 	var total_ships_lost: int = 0
-	var campaign_progress_percentage: float = 0.0
-	var highest_level: int = 1
 	var last_updated: String = ""
+	var battleship_kills: int = 0
+	var battleship_deaths: int = 0
+	var battleship_accuracy: int =0
+	var cruiser_kills: int =0
+	var cruiser_deaths: int =0
+	var cruiser_accuracy: int =0
+	var destroyer_kills: int =0
+	var destroyer_deaths: int =0
+	var destroyer_accuracy: int=0
+	var corvette_kills: int = 0
+	var corvette_deaths: int =0
+	var corvette_accuracy: int=0
+	var torpedo_boat_kills: int =0
+	var torpedo_boat_deaths: int =0
+	var torpedo_boat_accuracy: int =0
 
 	func _init() -> void:
-		level = 1
-		highest_level = 1
 		last_updated = Time.get_datetime_string_from_system()
 
 	func get_win_rate() -> float:
@@ -57,59 +63,8 @@ class PlayerStats:
 		return float(total_wins) / float(total_battles) * 100.0
 
 	func _to_string() -> String:
-		return "Stats — Lvl:%d XP:%d W-L-D:%d-%d-%d WinRate:%.1f%%" % [
-			level, total_experience, total_wins, total_losses, total_draws, get_win_rate()
-		]
+		return "Stats — W-L-D:%d-%d-%d WinRate:%.1f%%" % [total_wins, total_losses, total_draws, get_win_rate()]
 
-
-# ── Captain ───────────────────────────────────────────────────────────────────
-
-class Captain:
-	var captain_id: int = 0
-	var player_id: int = 0
-	var captain_name: String = ""
-	var experience_points: int = 0
-	var level: int = 1
-	## General | Aggressive | Defensive | Scout
-	var specialization_class: String = "General"
-	var battles_participated: int = 0
-	var created_date: String = ""
-	var is_available: bool = true
-	## Accuracy bonus in percentage points: (level - 1) * 2.0
-	var accuracy_bonus: float = 0.0
-
-	func _init(p_name: String = "", spec: String = "General") -> void:
-		captain_name = p_name
-		specialization_class = spec
-		level = 1
-		is_available = true
-		accuracy_bonus = 0.0
-		created_date = Time.get_datetime_string_from_system()
-
-
-# ── CommandCard ───────────────────────────────────────────────────────────────
-
-class CommandCard:
-	var card_id: int = 0
-	var card_name: String = ""
-	var description: String = ""
-	var required_captain_level: int = 1
-	## Extra accuracy bonus while this card is active
-	var accuracy_bonus: float = 0.0
-	## Tactical | Offensive | Defensive
-	var card_type: String = "Tactical"
-
-	func _to_string() -> String:
-		return "[Lvl %d] %s (%s) — %s" % [required_captain_level, card_name, card_type, description]
-
-
-# ── CaptainCommandCard ────────────────────────────────────────────────────────
-
-class CaptainCommandCard:
-	var id: int = 0
-	var captain_id: int = 0
-	var card_id: int = 0
-	var unlocked_date: String = ""
 
 
 # ── BattleRecord ──────────────────────────────────────────────────────────────
@@ -120,10 +75,9 @@ class BattleRecord:
 	var opponent_name: String = ""
 	var battle_date: String = ""
 	## Win | Loss | Draw
-	var result: String = ""
+	var result: int= 1 # presupun winner player=1, 2=openent wins
 	var ships_destroyed: int = 0
 	var ships_lost: int = 0
-	var experience_gained: int = 0
 	## Easy | Normal | Hard | Expert
 	var difficulty_level: String = "Normal"
 	## SkirmishBattle | Campaign | Multiplayer
@@ -135,51 +89,27 @@ class BattleRecord:
 		battle_mode = "SkirmishBattle"
 
 	func _to_string() -> String:
-		return "Battle vs %s (%s) — %s | XP: +%d" % [opponent_name, battle_date, result, experience_gained]
+		return "Battle vs %s (%s) — %s" % [opponent_name, battle_date, result]
 
 
-# ── CampaignSave ──────────────────────────────────────────────────────────────
-
-class CampaignSave:
-	var save_id: int = 0
+# ── Move ──────────────────────────────────────────────────────────────
+class Move:
+	var move_id: int =0
+	var turn_number: int = 0
+	var match_id: int =0
 	var player_id: int = 0
-	var campaign_name: String = ""
-	var current_turn: int = 1
-	var territory_controlled: int = 0
-	var resource_points: int = 0
-	var enemy_faction: String = "Japan"
-	var difficulty_level: String = "Normal"
-	var save_date: String = ""
-	var last_loaded_date: String = ""
-	var is_active: bool = true
+	var type: String = ""
+	var distance: float = 0.0
+	var angle: float = 0.0
+	var position: String = ""
 
-	func _init(p_campaign_name: String = "", difficulty: String = "Normal") -> void:
-		campaign_name = p_campaign_name
-		current_turn = 1
-		resource_points = 0
-		enemy_faction = "Japan"
-		difficulty_level = difficulty
-		save_date = Time.get_datetime_string_from_system()
-		is_active = true
+	func _init(p_match_id: int = 0, p_turn: int = 0) -> void:
+		match_id = p_match_id
+		turn_number = p_turn
+		type = "Move"
+		distance = 0.0
+		angle = 0.0
+		position = "0,0"
 
-
-# ── ShipUnlockRequirement ─────────────────────────────────────────────────────
-
-class ShipUnlockRequirement:
-	var ship_type: String = ""
-	var required_level: int = 1
-	var display_name: String = ""
-	var description: String = ""
-
-
-# ── ShipUnlockStatus ──────────────────────────────────────────────────────────
-
-class ShipUnlockStatus:
-	var ship_type: String = ""
-	var display_name: String = ""
-	var required_level: int = 1
-	var is_unlocked: bool = false
-	var description: String = ""
-
-	func get_unlock_label() -> String:
-		return "Unlocked" if is_unlocked else "Requires Fleet Level %d" % required_level
+	func _to_string() -> String:
+		return "Move #%d: Player %d performed %s at turn %d" % [move_id, player_id, type, turn_number]
