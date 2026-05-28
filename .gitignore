@@ -6,3 +6,5 @@ game/bin/*.pck
 game/bin/*.x86_64
 game/bin/*.exe
 
+# Blender
+game/assets/models/.blend1
