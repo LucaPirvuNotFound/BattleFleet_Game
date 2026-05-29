@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://d15ttkknixytw"]
+
+[node name="MainMenu" type="Node2D" unique_id=1405458839]
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1411525289]
+offset_left = 49.0
+offset_top = 69.0
+offset_right = 1135.0
+offset_bottom = 586.0
+text = "Write this shit"

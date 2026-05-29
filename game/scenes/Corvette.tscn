@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://5gceoldkf58f"]
-
-[ext_resource type="PackedScene" uid="uid://cwbto747ej0pf" path="res://assets/models/WIP/Corvette.blend" id="1_ss3a1"]
-
-[node name="Corvette2" unique_id=456712928 instance=ExtResource("1_ss3a1")]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
