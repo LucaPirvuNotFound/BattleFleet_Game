@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="BattleFeet"
+run/main_scene="uid://grdw3v1vwgug"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+NetworkManager="*uid://dwehwnbw8dbv2"
 
 [physics]
 
