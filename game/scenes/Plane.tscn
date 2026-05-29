@@ -6,4 +6,5 @@
 [node name="Airframe" unique_id=814412957 instance=ExtResource("1_forlt")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 
-[node name="Propeler" parent="." index="1" unique_id=1400914501 instance=ExtResource("2_duinr")]
+[node name="Propeler" parent="." index="1" unique_id=495148608 instance=ExtResource("2_duinr")]
+transform = Transform3D(0.9998807, -0.015445552, 0, 0.015445552, 0.9998807, 0, 0, 0, 1, -0.03271833, 1.2334661, 4.1622357)
