@@ -1,27 +1,11 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v5.1.19",
+		"generator":"Khronos glTF Blender I/O v5.1.20",
 		"version":"2.0"
 	},
 	"scene":0,
 	"scenes":[
 		{
-			"extras":{
-				"bsurfaces":{
-					"SURFSK_mesh":{
-						"name":"BSurfaceMesh.001",
-						"type":"Object"
-					},
-					"SURFSK_shade_smooth":0,
-					"SURFSK_edges_U":5,
-					"SURFSK_edges_V":1,
-					"SURFSK_cyclic_cross":0,
-					"SURFSK_cyclic_follow":0,
-					"SURFSK_automatic_join":1,
-					"SURFSK_loops_on_strokes":1,
-					"SURFSK_keep_strokes":0
-				}
-			},
 			"name":"Scene",
 			"nodes":[
 				0
@@ -36,11 +20,6 @@
 				0.10000002384185791,
 				0.10000002384185791,
 				0.10000002384185791
-			],
-			"translation":[
-				0,
-				1.25,
-				2.75
 			]
 		}
 	],
