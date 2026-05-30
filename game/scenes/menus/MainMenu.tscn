@@ -1,10 +1,632 @@
-[gd_scene format=3 uid="uid://d15ttkknixytw"]
+[gd_scene load_steps=15 format=3 uid="uid://d15ttkknixytw"]
 
-[node name="MainMenu" type="Node2D" unique_id=1405458839]
+[ext_resource type="Script" uid="uid://be3wnadgddv6f" path="res://scenes/menus/MainMenu.gd" id="1_menu"]
+[ext_resource type="PackedScene" uid="uid://grdw3v1vwgug" path="res://scenes/WaterPlane.tscn" id="2_water"]
 
-[node name="TextEdit" type="TextEdit" parent="." unique_id=1411525289]
-offset_left = 49.0
-offset_top = 69.0
-offset_right = 1135.0
-offset_bottom = 586.0
-text = "Write this shit"
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_menu"]
+sky_top_color = Color(0.28, 0.45, 0.7, 1)
+sky_horizon_color = Color(0.5, 0.64, 0.8, 1)
+sky_curve = 0.15
+sky_energy_multiplier = 1.15
+ground_bottom_color = Color(0.1, 0.14, 0.2, 1)
+ground_horizon_color = Color(0.38, 0.5, 0.62, 1)
+sun_angle_max = 40.0
+
+[sub_resource type="Sky" id="Sky_menu"]
+sky_material = SubResource("ProceduralSkyMaterial_menu")
+
+[sub_resource type="Environment" id="Environment_menu"]
+background_mode = 2
+sky = SubResource("Sky_menu")
+ambient_light_source = 2
+ambient_light_color = Color(0.42, 0.55, 0.72, 1)
+ambient_light_energy = 0.55
+reflected_light_source = 2
+tonemap_mode = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.06, 0.1, 0.16, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.5, 0.68, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.1, 0.16, 0.24, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.55, 0.72, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.12, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.45, 0.6, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.14, 0.22, 0.32, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.72, 0.9, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_disabled"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.1, 0.12, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.28, 0.32, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.04, 0.07, 0.11, 0.75)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.42, 0.55, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MainMenu" type="Control" unique_id=1185961012]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="BackgroundViewport" type="SubViewportContainer" parent="." unique_id=288849577]
+z_index = -10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="BackgroundViewport" unique_id=1581236106]
+handle_input_locally = false
+gui_disable_input = true
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="BackgroundViewport/SubViewport"]
+environment = SubResource("Environment_menu")
+
+[node name="SunLight" type="DirectionalLight3D" parent="BackgroundViewport/SubViewport"]
+transform = Transform3D(0.939693, -0.17101, 0.296198, 0, 0.866025, 0.5, -0.34202, -0.469846, 0.813798, 0, 14, 0)
+light_color = Color(1, 0.95, 0.86, 1)
+light_energy = 1.4
+shadow_enabled = false
+
+[node name="WaterPlane" parent="BackgroundViewport/SubViewport" unique_id=844790265 instance=ExtResource("2_water")]
+
+[node name="Camera3D" type="Camera3D" parent="BackgroundViewport/SubViewport" unique_id=687434807]
+transform = Transform3D(1, 0, 0, 0, 0.848048, 0.529919, 0, -0.529919, 0.848048, 0, 4.0, 15.0)
+current = true
+fov = 48.0
+
+[node name="UI" type="Control" parent="." unique_id=1976257099]
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Stage1" type="MarginContainer" parent="UI" unique_id=458465144]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
+
+[node name="CenterWrap" type="CenterContainer" parent="UI/Stage1" unique_id=233232409]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainPanel" type="PanelContainer" parent="UI/Stage1/CenterWrap" unique_id=1792562628]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="UI/Stage1/CenterWrap/MainPanel" unique_id=2002175337]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=465432727]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 42
+text = "BATTLEFLEET"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=1752646883]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.78, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 14
+text = "Naval Combat Command"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=2135444588]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="Play" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=1895008160]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Play"
+
+[node name="Replays" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=268299269]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Replays"
+
+[node name="Stats" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=1140212692]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Stats"
+
+[node name="Settings" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=906801432]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Settings"
+
+[node name="Quit" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=398593506]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.75, 0.72, 1)
+theme_override_colors/font_hover_color = Color(1, 0.85, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Quit"
+
+[node name="Stage2" type="MarginContainer" parent="UI" unique_id=293028042]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
+
+[node name="CenterWrap" type="CenterContainer" parent="UI/Stage2" unique_id=1278231613]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ModePanel" type="PanelContainer" parent="UI/Stage2/CenterWrap" unique_id=1571648025]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="UI/Stage2/CenterWrap/ModePanel" unique_id=1588558405]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="UI/Stage2/CenterWrap/ModePanel/VBox" unique_id=1897329382]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 28
+text = "Select Game Mode"
+horizontal_alignment = 1
+
+[node name="PlayPvP" type="Button" parent="UI/Stage2/CenterWrap/ModePanel/VBox" unique_id=1638422182]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Play PvP"
+
+[node name="PlayPvE" type="Button" parent="UI/Stage2/CenterWrap/ModePanel/VBox" unique_id=1419132406]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Play PvE"
+
+[node name="PlayLocal" type="Button" parent="UI/Stage2/CenterWrap/ModePanel/VBox" unique_id=953749309]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Play Local"
+
+[node name="Back" type="Button" parent="UI/Stage2/CenterWrap/ModePanel/VBox" unique_id=2114429913]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Back"
+
+[node name="Stage3" type="MarginContainer" parent="UI" unique_id=466496018]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxRoot" type="VBoxContainer" parent="UI/Stage3" unique_id=156590844]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="UI/Stage3/VBoxRoot" unique_id=661137917]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="UI/Stage3/VBoxRoot/Header" unique_id=1560055937]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 26
+text = "Fleet Builder"
+
+[node name="Back" type="Button" parent="UI/Stage3/VBoxRoot/Header" unique_id=878283847]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Back"
+
+[node name="BuilderRow" type="HBoxContainer" parent="UI/Stage3/VBoxRoot" unique_id=969606321]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="LeftPanel" type="PanelContainer" parent="UI/Stage3/VBoxRoot/BuilderRow" unique_id=1201470565]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LeftVBox" type="VBoxContainer" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel" unique_id=1559756808]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LeftTitle" type="Label" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1485701142]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.98, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+text = "Add Ship (max 5)"
+
+[node name="AddCorvette" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1741801788]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Corvette (10 pts)"
+
+[node name="AddPlane" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1894502676]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Plane (15 pts)"
+
+[node name="AddDestroyer" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1684154407]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Destroyer (20 pts)"
+
+[node name="AddCruiser" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1825999739]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Cruiser (35 pts)"
+
+[node name="AddBattleship" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox" unique_id=1973329134]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Battleship (50 pts)"
+
+[node name="CenterPanel" type="PanelContainer" parent="UI/Stage3/VBoxRoot/BuilderRow" unique_id=691252392]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="CenterVBox" type="VBoxContainer" parent="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel" unique_id=245887834]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CenterTitle" type="Label" parent="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox" unique_id=1200729913]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.98, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+text = "Selected Fleet"
+
+[node name="FleetTree" type="Tree" parent="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox" unique_id=1836017890]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.9, 0.93, 0.98, 1)
+theme_override_constants/inner_item_margin_bottom = 10
+theme_override_constants/inner_item_margin_left = 14
+theme_override_constants/inner_item_margin_right = 10
+theme_override_constants/inner_item_margin_top = 6
+theme_override_constants/item_margin = 10
+theme_override_font_sizes/font_size = 14
+theme_override_styles/panel = SubResource("StyleBoxFlat_tree")
+allow_reselect = true
+hide_root = true
+
+[node name="RemoveShipButton" type="Button" parent="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox" unique_id=1453259052]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Remove Selected Ship"
+
+[node name="RightPanel" type="PanelContainer" parent="UI/Stage3/VBoxRoot/BuilderRow" unique_id=2096583960]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="RightVBox" type="VBoxContainer" parent="UI/Stage3/VBoxRoot/BuilderRow/RightPanel" unique_id=1179485970]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RightTitle" type="Label" parent="UI/Stage3/VBoxRoot/BuilderRow/RightPanel/RightVBox" unique_id=287968746]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.98, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+text = "Weapon Loadout"
+
+[node name="WeaponPanelHint" type="Label" parent="UI/Stage3/VBoxRoot/BuilderRow/RightPanel/RightVBox" unique_id=1590419761]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 13
+text = "Select a ship in the fleet tree to equip weapons (max 3 per ship)."
+autowrap_mode = 3
+
+[node name="WeaponButtons" type="VBoxContainer" parent="UI/Stage3/VBoxRoot/BuilderRow/RightPanel/RightVBox" unique_id=1539839301]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BottomBar" type="PanelContainer" parent="UI/Stage3/VBoxRoot" unique_id=1558113849]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="BottomHBox" type="HBoxContainer" parent="UI/Stage3/VBoxRoot/BottomBar" unique_id=443346752]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TotalCostLabel" type="Label" parent="UI/Stage3/VBoxRoot/BottomBar/BottomHBox" unique_id=191976363]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.88, 0.92, 0.98, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "Total Cost: 0 / 100"
+vertical_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="UI/Stage3/VBoxRoot/BottomBar/BottomHBox" unique_id=863175052]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.95, 0.65, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.52, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+disabled = true
+text = "Continue"
+
+[node name="SettingsPanel" type="PanelContainer" parent="UI" unique_id=2008571949]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -140.0
+offset_right = 220.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="SettingsVBox" type="VBoxContainer" parent="UI/SettingsPanel" unique_id=480494815]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SettingsTitle" type="Label" parent="UI/SettingsPanel/SettingsVBox" unique_id=1977434266]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="SettingsPlaceholder" type="Label" parent="UI/SettingsPanel/SettingsVBox" unique_id=1234897062]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+text = "Audio, graphics, and controls — coming soon."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SettingsClose" type="Button" parent="UI/SettingsPanel/SettingsVBox" unique_id=993658609]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Close"
+
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Replays" to="." method="_on_replays_pressed"]
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Stats" to="." method="_on_stats_pressed"]
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayPvP" to="." method="_on_mode_selected" binds= ["PvP"]]
+[connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayPvE" to="." method="_on_mode_selected" binds= ["PvE"]]
+[connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayLocal" to="." method="_on_mode_selected" binds= ["Local"]]
+[connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/Back" to="." method="_on_stage2_back_pressed"]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/Header/Back" to="." method="_on_stage3_back_pressed"]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox/AddCorvette" to="." method="_on_add_ship_pressed" binds= ["Corvette"]]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox/AddPlane" to="." method="_on_add_ship_pressed" binds= ["Plane"]]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox/AddDestroyer" to="." method="_on_add_ship_pressed" binds= ["Destroyer"]]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox/AddCruiser" to="." method="_on_add_ship_pressed" binds= ["Cruiser"]]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/LeftPanel/LeftVBox/AddBattleship" to="." method="_on_add_ship_pressed" binds= ["Battleship"]]
+[connection signal="item_selected" from="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox/FleetTree" to="." method="_on_fleet_tree_item_selected"]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox/RemoveShipButton" to="." method="_on_remove_ship_pressed"]
+[connection signal="pressed" from="UI/Stage3/VBoxRoot/BottomBar/BottomHBox/ContinueButton" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="UI/SettingsPanel/SettingsVBox/SettingsClose" to="." method="_on_settings_close_pressed"]
