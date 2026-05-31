@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    container_name: battlefleet_server
+    network_mode: "host"
+    volumes:
+      - ./instance:/app/instance
+
