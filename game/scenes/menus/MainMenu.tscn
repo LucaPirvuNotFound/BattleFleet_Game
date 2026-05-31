@@ -29,7 +29,7 @@ content_margin_left = 16.0
 content_margin_top = 16.0
 content_margin_right = 16.0
 content_margin_bottom = 16.0
-bg_color = Color(0.06, 0.1, 0.16, 0.8)
+bg_color = Color(0.06, 0.1, 0.16, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -45,7 +45,7 @@ content_margin_left = 20.0
 content_margin_top = 10.0
 content_margin_right = 20.0
 content_margin_bottom = 10.0
-bg_color = Color(0.1, 0.16, 0.24, 0.92)
+bg_color = Color(0.1, 0.16, 0.24, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -109,7 +109,7 @@ content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.04, 0.07, 0.11, 0.75)
+bg_color = Color(0.04, 0.07, 0.11, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -254,6 +254,17 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
 text = "Stats"
+
+[node name="LogIn" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+text = "Log In"
 
 [node name="Settings" type="Button" parent="UI/Stage1/CenterWrap/MainPanel/VBox" unique_id=906801432]
 layout_mode = 2
@@ -563,6 +574,182 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
 disabled = true
 text = "Continue"
 
+[node name="AuthPanel" type="PanelContainer" parent="UI"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.0
+offset_top = -280.0
+offset_right = 270.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LoginPanel" type="VBoxContainer" parent="UI/AuthPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LoginTitle" type="Label" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "Log In"
+horizontal_alignment = 1
+
+[node name="LoginUsernameLabel" type="Label" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Username"
+
+[node name="LoginUsername" type="LineEdit" parent="UI/AuthPanel/LoginPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+placeholder_text = "Enter username"
+
+[node name="LoginPasswordLabel" type="Label" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Password"
+
+[node name="LoginPassword" type="LineEdit" parent="UI/AuthPanel/LoginPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+placeholder_text = "Enter password"
+secret = true
+
+[node name="LoginSubmit" type="Button" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Log In"
+
+[node name="GoToRegister" type="Button" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+flat = true
+theme_override_colors/font_color = Color(0.65, 0.82, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.85, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Don't have an account? Register now"
+
+[node name="LoginClose" type="Button" parent="UI/AuthPanel/LoginPanel"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Close"
+
+[node name="RegisterPanel" type="VBoxContainer" parent="UI/AuthPanel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RegisterTitle" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "Register"
+horizontal_alignment = 1
+
+[node name="RegisterEmailLabel" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Email"
+
+[node name="RegisterEmail" type="LineEdit" parent="UI/AuthPanel/RegisterPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+placeholder_text = "name@example.com"
+
+[node name="RegisterUsernameLabel" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Username"
+
+[node name="RegisterUsername" type="LineEdit" parent="UI/AuthPanel/RegisterPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+placeholder_text = "Choose a username"
+
+[node name="RegisterPasswordLabel" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Password"
+
+[node name="RegisterPassword" type="LineEdit" parent="UI/AuthPanel/RegisterPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+placeholder_text = "Password"
+secret = true
+
+[node name="RegisterPasswordConfirmLabel" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.95, 1)
+text = "Password again"
+
+[node name="RegisterPasswordConfirm" type="LineEdit" parent="UI/AuthPanel/RegisterPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+placeholder_text = "Confirm password"
+secret = true
+
+[node name="RegisterStatusLabel" type="Label" parent="UI/AuthPanel/RegisterPanel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 14
+text = "Register failed: invalid email."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RegisterSubmit" type="Button" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Register"
+
+[node name="GoToLogin" type="Button" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+flat = true
+theme_override_colors/font_color = Color(0.65, 0.82, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.85, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Already have an account? Log in"
+
+[node name="RegisterClose" type="Button" parent="UI/AuthPanel/RegisterPanel"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Close"
+
 [node name="SettingsPanel" type="PanelContainer" parent="UI" unique_id=2008571949]
 unique_name_in_owner = true
 visible = false
@@ -614,8 +801,16 @@ text = "Close"
 [connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Replays" to="." method="_on_replays_pressed"]
 [connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Stats" to="." method="_on_stats_pressed"]
+[connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/LogIn" to="." method="_on_log_in_menu_pressed"]
 [connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="UI/Stage1/CenterWrap/MainPanel/VBox/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/LoginPanel/LoginSubmit" to="." method="_on_login_submit_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/LoginPanel/GoToRegister" to="." method="_on_go_to_register_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/LoginPanel/LoginClose" to="." method="_on_auth_close_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/RegisterPanel/RegisterSubmit" to="." method="_on_register_submit_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/RegisterPanel/GoToLogin" to="." method="_on_go_to_login_pressed"]
+[connection signal="pressed" from="UI/AuthPanel/RegisterPanel/RegisterClose" to="." method="_on_auth_close_pressed"]
+[connection signal="text_submitted" from="UI/AuthPanel/LoginPanel/LoginPassword" to="." method="_on_login_submit_pressed"]
 [connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayPvP" to="." method="_on_mode_selected" binds= ["PvP"]]
 [connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayPvE" to="." method="_on_mode_selected" binds= ["PvE"]]
 [connection signal="pressed" from="UI/Stage2/CenterWrap/ModePanel/VBox/PlayLocal" to="." method="_on_mode_selected" binds= ["Local"]]

@@ -28,6 +28,21 @@ const SHIP_ROW_TEXT_SELECTED := Color(0.95, 0.98, 1.0)
 
 @onready var _stages: Array[Control] = [%Stage1, %Stage2, %Stage3]
 @onready var _settings_panel: PanelContainer = %SettingsPanel
+@onready var _auth_panel: PanelContainer = %AuthPanel
+@onready var _login_panel: VBoxContainer = %LoginPanel
+@onready var _register_panel: VBoxContainer = %RegisterPanel
+@onready var _login_username: LineEdit = %LoginUsername
+@onready var _login_password: LineEdit = %LoginPassword
+@onready var _register_email: LineEdit = %RegisterEmail
+@onready var _register_username: LineEdit = %RegisterUsername
+@onready var _register_password: LineEdit = %RegisterPassword
+@onready var _register_password_confirm: LineEdit = %RegisterPasswordConfirm
+@onready var _register_status_label: Label = %RegisterStatusLabel
+
+const REGISTER_ERROR_INVALID_EMAIL := "Register failed: invalid email."
+const REGISTER_ERROR_PASSWORD_MISMATCH := "Register failed: passwords do not match."
+
+var _email_regex: RegEx
 @onready var _fleet_tree: Tree = %FleetTree
 @onready var _total_cost_label: Label = %TotalCostLabel
 @onready var _continue_button: Button = %ContinueButton
@@ -42,6 +57,9 @@ var _selected_fleet_index: int = -1
 
 
 func _ready() -> void:
+	_email_regex = RegEx.new()
+	_email_regex.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
 	_fleet_tree.hide_root = true
 	_tree_root = _fleet_tree.create_item()
 	_configure_fleet_tree_theme()
@@ -51,6 +69,8 @@ func _ready() -> void:
 	_update_cost_display()
 	_update_weapon_panel()
 	_settings_panel.visible = false
+	_auth_panel.visible = false
+	_show_login_form()
 
 
 func change_stage(target_index: int) -> void:
@@ -97,11 +117,99 @@ func _on_stats_pressed() -> void:
 
 
 func _on_settings_pressed() -> void:
+	_auth_panel.visible = false
 	_settings_panel.visible = true
 
 
 func _on_settings_close_pressed() -> void:
 	_settings_panel.visible = false
+
+
+func _on_log_in_menu_pressed() -> void:
+	_settings_panel.visible = false
+	_clear_auth_fields()
+	_show_login_form()
+	_auth_panel.visible = true
+
+
+func _on_auth_close_pressed() -> void:
+	_auth_panel.visible = false
+
+
+func _show_login_form() -> void:
+	_login_panel.visible = true
+	_register_panel.visible = false
+	_clear_register_status()
+
+
+func _show_register_form() -> void:
+	_login_panel.visible = false
+	_register_panel.visible = true
+	_clear_register_status()
+
+
+func _clear_register_status() -> void:
+	_register_status_label.text = ""
+	_register_status_label.visible = false
+
+
+func _show_register_error(message: String) -> void:
+	_register_status_label.text = message
+	_register_status_label.visible = true
+
+
+func _clear_auth_fields() -> void:
+	_login_username.text = ""
+	_login_password.text = ""
+	_register_email.text = ""
+	_register_username.text = ""
+	_register_password.text = ""
+	_register_password_confirm.text = ""
+	_clear_register_status()
+
+
+func _is_valid_email(email: String) -> bool:
+	if email.is_empty():
+		return false
+	return _email_regex.search(email) != null
+
+
+func _on_login_submit_pressed() -> void:
+	print(
+		"[Battlefleet] user want to log in with information :",
+		_login_username.text,
+		_login_password.text
+	)
+
+
+func _on_go_to_register_pressed() -> void:
+	_show_register_form()
+
+
+func _on_go_to_login_pressed() -> void:
+	_show_login_form()
+
+
+func _on_register_submit_pressed() -> void:
+	var email := _register_email.text.strip_edges()
+	var username := _register_username.text.strip_edges()
+	var password := _register_password.text
+	var password_again := _register_password_confirm.text
+
+	if not _is_valid_email(email):
+		_show_register_error(REGISTER_ERROR_INVALID_EMAIL)
+		return
+	if password != password_again:
+		_show_register_error(REGISTER_ERROR_PASSWORD_MISMATCH)
+		return
+
+	_clear_register_status()
+	print(
+		"[Battlefleet] user want to register with information :",
+		email,
+		username,
+		password
+	)
 
 
 func _on_quit_pressed() -> void:
