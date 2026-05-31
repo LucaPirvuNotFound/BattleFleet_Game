@@ -1,8 +1,9 @@
 services:
   web:
-    build: .
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
     container_name: battlefleet_server
-    network_mode: "host"
     volumes:
       - ./instance:/app/instance
 
