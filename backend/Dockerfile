@@ -3,14 +3,14 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Python modules
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Python source
-COPY . .
+COPY backend/ .
 
 # Godot Server
-COPY ../game/bin/linux-x86_64.pck
+# COPY ../game/bin/linux-x86_64.pck
 
 EXPOSE 8000
 
