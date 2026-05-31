@@ -38,6 +38,8 @@ const SHIP_ROW_TEXT_SELECTED := Color(0.95, 0.98, 1.0)
 @onready var _register_password: LineEdit = %RegisterPassword
 @onready var _register_password_confirm: LineEdit = %RegisterPasswordConfirm
 @onready var _register_status_label: Label = %RegisterStatusLabel
+@onready var _login_submit: Button = _login_panel.get_node("LoginSubmit")
+@onready var _register_submit: Button = _register_panel.get_node("RegisterSubmit")
 
 const REGISTER_ERROR_INVALID_EMAIL := "Register failed: invalid email."
 const REGISTER_ERROR_PASSWORD_MISMATCH := "Register failed: passwords do not match."
@@ -175,11 +177,21 @@ func _is_valid_email(email: String) -> bool:
 
 
 func _on_login_submit_pressed() -> void:
-	print(
-		"[Battlefleet] user want to log in with information :",
-		_login_username.text,
-		_login_password.text
-	)
+	var username := _login_username.text.strip_edges()
+	var password := _login_password.text
+
+	_login_submit.disabled = true
+	var result: Dictionary = await NetworkManager.auth_service.login_user(username, password)
+
+	if result.success:
+		print("[Battlefleet] Login successful! Token saved.")
+		_auth_panel.visible = false
+		print("[Battlefleet] Next step: fleet setup / matchmaking (not implemented yet).")
+	else:
+		var error_message := str(result.get("error", "Login failed."))
+		print("[Battlefleet] Login failed: %s" % error_message)
+
+	_login_submit.disabled = false
 
 
 func _on_go_to_register_pressed() -> void:
@@ -204,12 +216,26 @@ func _on_register_submit_pressed() -> void:
 		return
 
 	_clear_register_status()
-	print(
-		"[Battlefleet] user want to register with information :",
-		email,
+	_register_submit.disabled = true
+	var result: Dictionary = await NetworkManager.auth_service.register_user(
 		username,
+		email,
 		password
 	)
+
+	if result.success:
+		var payload: Dictionary = result.get("payload", result.get("data", {}))
+		var success_message := str(
+			result.get("message", payload.get("message", "User registered successfully."))
+		)
+		print("[Battlefleet] Registration successful: %s" % success_message)
+		_show_login_form()
+	else:
+		var error_message := str(result.get("error", "Registration failed."))
+		print("[Battlefleet] Registration failed: %s" % error_message)
+		_show_register_error(error_message)
+
+	_register_submit.disabled = false
 
 
 func _on_quit_pressed() -> void:
