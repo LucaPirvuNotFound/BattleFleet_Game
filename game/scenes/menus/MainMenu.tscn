@@ -387,6 +387,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Title" type="Label" parent="UI/Stage3/VBoxRoot/Header" unique_id=1560055937]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
@@ -573,6 +574,53 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
 disabled = true
 text = "Continue"
+
+[node name="QueueOverlay" type="Control" parent="UI"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="UI/QueueOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -72.0
+offset_right = 260.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="QueueVBox" type="VBoxContainer" parent="UI/QueueOverlay/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="QueueLabel" type="Label" parent="UI/QueueOverlay/Panel/QueueVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Finding opponent..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CancelQueueButton" type="Button" parent="UI/QueueOverlay/Panel/QueueVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "Cancel"
 
 [node name="AuthPanel" type="PanelContainer" parent="UI"]
 unique_name_in_owner = true
@@ -824,4 +872,5 @@ text = "Close"
 [connection signal="item_selected" from="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox/FleetTree" to="." method="_on_fleet_tree_item_selected"]
 [connection signal="pressed" from="UI/Stage3/VBoxRoot/BuilderRow/CenterPanel/CenterVBox/RemoveShipButton" to="." method="_on_remove_ship_pressed"]
 [connection signal="pressed" from="UI/Stage3/VBoxRoot/BottomBar/BottomHBox/ContinueButton" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="UI/QueueOverlay/Panel/QueueVBox/CancelQueueButton" to="." method="_on_cancel_queue_pressed"]
 [connection signal="pressed" from="UI/SettingsPanel/SettingsVBox/SettingsClose" to="." method="_on_settings_close_pressed"]
