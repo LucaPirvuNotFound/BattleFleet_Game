@@ -70,4 +70,111 @@ Our team of 5 is structured to ensure every rubric requirement (Agile, Git, Test
 
 ## 🚀 How to Run Locally
 
-*(To be filled by the Lead Developer: Add instructions on how to install dependencies, run the local Ollama server, and launch the game).*
+The repo has two runnable pieces today:
+
+| Component | Role | Port |
+|-----------|------|------|
+| `backend/` | FastAPI — register/login, JWT tokens | `8000` |
+| `game/` | Godot 4.6 client — menu, fleet builder, 3D water backdrop | n/a |
+
+**Not implemented yet:** Ollama / Enemy Admiral / Deck Officer (described above, but no LLM integration in the codebase). You can install Ollama for future work; it is not required for the current build.
+
+### Prerequisites
+
+- **Godot Engine 4.6** (matches `config/features` in `game/project.godot`). On Raspberry Pi / Linux ARM64, download from [godotengine.org/download](https://godotengine.org/download) or use the install steps below.
+- **Python 3.11+** or **Docker** for the backend.
+- Backend and client must reach the same host: the API base URL is `http://127.0.0.1:8000` in `game/scripts/network/api_client.gd`.
+
+### 1. Start the backend
+
+**Docker (recommended):**
+
+```bash
+cd backend
+docker compose up --build
+```
+
+**Local Python venv:**
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export BATTLEFLEET_SECRET_KEY=dev_secret_key_here
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Verify: open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs), or:
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","email":"test@example.com","password":"secret123"}'
+
+curl -s -X POST http://127.0.0.1:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"secret123"}'
+```
+
+User data is **in-memory** — restarting the backend clears accounts.
+
+### 2. Install and run the Godot client
+
+**Linux ARM64** (e.g. Raspberry Pi) — install the binary under `game/bin/` (see [game/bin/README.md](game/bin/README.md)):
+
+```bash
+cd game/bin
+curl -fsSL -o Godot_v4.6-stable_linux.arm64.zip \
+  https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.arm64.zip
+unzip Godot_v4.6-stable_linux.arm64.zip
+chmod +x Godot_v4.6-stable_linux.arm64
+ln -sf Godot_v4.6-stable_linux.arm64 godot
+```
+
+From the **repo root**, import assets on first clone, then run:
+
+```bash
+./game/bin/godot --path game/ --import   # once
+./game/bin/godot --path game/
+```
+
+Or open `game/` in the Godot 4.6 editor and press **F5** (Play).
+
+**Headless server mode** (prints `"Hello from server"` only — not gameplay):
+
+```bash
+./game/bin/godot --path game/ --headless -- --server
+```
+
+### 3. Test auth in the game
+
+1. Ensure the backend is running on port `8000`.
+2. Main menu → **Settings** → **Log in**.
+3. **Register**, then **Log in** — on success, the token is stored via `NetworkManager` / `auth_service.gd`.
+4. Check the Godot **Output** panel for `[Battlefleet] Login successful! Token saved.`
+
+Fleet builder (Play → mode → ships/weapons → Continue) only logs fleet JSON today; matchmaking and combat are not wired up yet.
+
+### 4. Ollama (optional, future)
+
+When Agent 1/2 are implemented:
+
+```bash
+ollama serve
+ollama pull phi3
+```
+
+No game code calls Ollama today.
+
+### Troubleshooting
+
+| Symptom | Likely cause |
+|---------|----------------|
+| `cannot connect` in game | Backend down or wrong port |
+| Register works once, fails after restart | In-memory user DB cleared on backend restart |
+| Godot version mismatch | Project needs **4.6** |
+| `Unrecognized UID` / main scene error | Run `./game/bin/godot --path game/ --import` once |
+| `libfontconfig.so.1` warning | Install `fontconfig` (`sudo apt install fontconfig` on Debian/Raspberry Pi OS) |
+| Slow / no 3D on Pi | 3D water scene is heavy; use a desktop for dev if needed |
+| Auth from another device | API URL is localhost-only; remote play needs a code change |
