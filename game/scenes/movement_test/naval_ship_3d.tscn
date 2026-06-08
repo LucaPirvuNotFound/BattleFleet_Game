@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dixy27qrlsrd0"]
+
+[ext_resource type="Script" uid="uid://bj6n8232t31uq" path="res://scenes/movement_test/ship.gd" id="1_5tygh"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0t8lc"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6e6go"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_5tygh"]
+size = Vector3(1, 1, 4)
+
+[node name="NavalShip3D" type="CharacterBody3D" unique_id=1877319141]
+script = ExtResource("1_5tygh")
+max_movement_distance = 30.0
+move_speed = 20.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=123188736]
+mesh = SubResource("CapsuleMesh_0t8lc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1546333429]
+shape = SubResource("CapsuleShape3D_6e6go")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=587220748]
+mesh = SubResource("BoxMesh_5tygh")

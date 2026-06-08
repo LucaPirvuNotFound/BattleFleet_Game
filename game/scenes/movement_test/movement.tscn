@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://yltw6djt0dwk"]
+
+[ext_resource type="Script" uid="uid://d0xumgqij7o1s" path="res://scenes/movement_test/battle_manager_3d.gd" id="2_4cs1n"]
+[ext_resource type="Script" uid="uid://cbcxlevgx3mng" path="res://scenes/movement_test/movement_controller_3d.gd" id="2_wkfhq"]
+[ext_resource type="PackedScene" uid="uid://dixy27qrlsrd0" path="res://scenes/movement_test/naval_ship_3d.tscn" id="3_4cs1n"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4cs1n"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_kfam3"]
+sky_material = SubResource("ProceduralSkyMaterial_4cs1n")
+
+[sub_resource type="Environment" id="Environment_0t8lc"]
+background_mode = 2
+sky = SubResource("Sky_kfam3")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_4cs1n"]
+size = Vector2(2048, 2048)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kfam3"]
+albedo_color = Color(0.16862746, 0.17254902, 1, 1)
+
+[node name="Movement" type="Node3D" unique_id=469371820]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1003015396]
+environment = SubResource("Environment_0t8lc")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=869449069]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="BattleGround" type="Node3D" parent="." unique_id=1500450695]
+
+[node name="Ocean" type="MeshInstance3D" parent="BattleGround" unique_id=1335559664]
+mesh = SubResource("PlaneMesh_4cs1n")
+surface_material_override/0 = SubResource("StandardMaterial3D_kfam3")
+
+[node name="Camera" type="Node3D" parent="." unique_id=1591166405]
+
+[node name="Camera3D" type="Camera3D" parent="Camera" unique_id=1355547137]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 50, 0)
+
+[node name="BattleManager3D" type="Node3D" parent="." unique_id=1494070977 node_paths=PackedStringArray("ships")]
+script = ExtResource("2_4cs1n")
+ships = [NodePath("Ships/NavalShip3D3"), NodePath("Ships/NavalShip3D2"), NodePath("Ships/NavalShip3D")]
+
+[node name="UI" type="CanvasLayer" parent="BattleManager3D" unique_id=1942437895]
+
+[node name="MovementController3D" type="Control" parent="BattleManager3D/UI" unique_id=530791497]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 128.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_wkfhq")
+
+[node name="AngleLabel" type="Label" parent="BattleManager3D/UI/MovementController3D" unique_id=641673441]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="AngleSlider" type="HSlider" parent="BattleManager3D/UI/MovementController3D" unique_id=1770857549]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 16.0
+
+[node name="DistanceLabel" type="Label" parent="BattleManager3D/UI/MovementController3D" unique_id=1700371411]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="DistanceSlider" type="HSlider" parent="BattleManager3D/UI/MovementController3D" unique_id=1060743440]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 16.0
+
+[node name="ConfirmButton" type="Button" parent="BattleManager3D/UI/MovementController3D" unique_id=494915527]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="Ships" type="Node3D" parent="BattleManager3D" unique_id=623587889]
+
+[node name="NavalShip3D3" parent="BattleManager3D/Ships" unique_id=1877319141 instance=ExtResource("3_4cs1n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8917162, 1.8643565, 1.0994883)
+
+[node name="NavalShip3D2" parent="BattleManager3D/Ships" unique_id=327857395 instance=ExtResource("3_4cs1n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4872293, 1.9205093, -2.8612251)
+
+[node name="NavalShip3D" parent="BattleManager3D/Ships" unique_id=1180711287 instance=ExtResource("3_4cs1n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2307205, 0)
