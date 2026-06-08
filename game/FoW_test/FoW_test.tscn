@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://bikycxgu28pqp"]
+
+[ext_resource type="PackedScene" uid="uid://m5ac3ckk4v4o" path="res://FoW_test/jucator.tscn" id="1_3rnar"]
+[ext_resource type="PackedScene" uid="uid://cfosyteic1jc8" path="res://FoW_test/inamic.tscn" id="2_4f2y0"]
+[ext_resource type="PackedScene" uid="uid://qk3cghneeimf" path="res://FoW_test/inamic_2.tscn" id="3_4f2y0"]
+[ext_resource type="Script" uid="uid://clh6aq8hnw71v" path="res://FoW_test/fog_manager.gd" id="4_rkspw"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rnar"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_4f2y0"]
+sky_material = SubResource("ProceduralSkyMaterial_3rnar")
+
+[sub_resource type="Environment" id="Environment_rkspw"]
+background_mode = 2
+sky = SubResource("Sky_4f2y0")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8jg4a"]
+size = Vector2(10, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d16uq"]
+albedo_color = Color(0.20392157, 0.46666667, 0.81960785, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ovmks"]
+size = Vector3(10, 0.1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rkspw"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8jg4a"]
+albedo_color = Color(0.18431373, 0.07058824, 0, 1)
+metallic = 0.75
+metallic_specular = 0.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_37n5u"]
+size = Vector3(2, 2, 2)
+
+[node name="FoWTest" type="Node3D" unique_id=1630760463]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1848906402]
+environment = SubResource("Environment_rkspw")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1040396353]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1836016462]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=408917160]
+mesh = SubResource("PlaneMesh_8jg4a")
+surface_material_override/0 = SubResource("StandardMaterial3D_d16uq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1983841824]
+shape = SubResource("BoxShape3D_ovmks")
+
+[node name="Jucator" parent="." unique_id=2095364073 instance=ExtResource("1_3rnar")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8021252, 0)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1904779392]
+transform = Transform3D(1, 0, 0, 0, -0.0013264851, 0.9999991, 0, -0.9999991, -0.0013264851, 0, 6.2045803, 0)
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=1186534630]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9395373, 0.8946898, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D2" unique_id=255046879]
+mesh = SubResource("BoxMesh_rkspw")
+surface_material_override/0 = SubResource("StandardMaterial3D_8jg4a")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=345815604]
+shape = SubResource("BoxShape3D_37n5u")
+
+[node name="Inamic" parent="." unique_id=1605785061 instance=ExtResource("2_4f2y0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.897013, 0.72524524, 2.1650596)
+
+[node name="Inamic2" parent="." unique_id=29379823 instance=ExtResource("3_4f2y0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.376802, 0.7939601, 1.8853428)
+
+[node name="Node3D" type="Node3D" parent="." unique_id=842994479]
+script = ExtResource("4_rkspw")

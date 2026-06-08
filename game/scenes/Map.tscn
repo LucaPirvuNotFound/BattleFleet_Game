@@ -48,6 +48,7 @@ transform = Transform3D(2172.9902, 0, 0, 0, 1, 0, 0, 0, 3940.6936, 0, 0, 0)
 [node name="Terrain" parent="." unique_id=1560107816 instance=ExtResource("2_lajc7")]
 unique_name_in_owner = true
 transform = Transform3D(0.9988981, 0, 0, 0, 0.9988981, 0, 0, 0, 0.9988981, 0, 0, 0)
+<<<<<<< HEAD
 mesh = SubResource("ArrayMesh_tm3qm")
 size = 1024.0
 
@@ -55,3 +56,8 @@ size = 1024.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.51876, 22.018185, 43.138275)
 mesh = SubResource("PlaneMesh_lajc7")
 surface_material_override/0 = SubResource("ShaderMaterial_yyirk")
+=======
+mesh = SubResource("ArrayMesh_xkm8s")
+size = 2048.0
+resolution = 1024
+>>>>>>> 253b8bec483033e842959fa73e220169beb3a620

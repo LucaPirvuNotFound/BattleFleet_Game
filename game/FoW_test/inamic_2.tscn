@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://qk3cghneeimf"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_75ny0"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_oggsd"]
+radius = 0.25
+height = 1.0
+
+[node name="Inamic2" type="CharacterBody3D" unique_id=29379823]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1726944596]
+mesh = SubResource("CapsuleMesh_75ny0")
+
+[node name="Inamic2" type="CollisionShape3D" parent="." unique_id=901345581]
+shape = SubResource("CapsuleShape3D_oggsd")

@@ -11,13 +11,26 @@ config_version=5
 [application]
 
 config/name="BattleFeet"
-run/main_scene="uid://grdw3v1vwgug"
+run/main_scene="uid://d15ttkknixytw"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 NetworkManager="*uid://dwehwnbw8dbv2"
+MatchContext="*res://scripts/match/MatchContext.gd"
+
+[filesystem]
+
+import/blender/enabled=false
+
+[dotnet]
+
+project/assembly_name="BattleFeet"
+
+[filesystem]
+
+import/blender/enabled=false
 
 [physics]
 
