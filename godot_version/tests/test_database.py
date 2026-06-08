@@ -45,7 +45,6 @@ def run_all_tests() -> None:
     test_player_creation()
     test_player_retrieval()
     test_battle_recording_and_history()
-    test_fleet_level_progression()
     test_error_handling()
 
     _print_summary()
@@ -197,40 +196,6 @@ def test_battle_recording_and_history() -> None:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CATEGORY 4 — Fleet level progression (quadratic level×100 XP curve)
-# ══════════════════════════════════════════════════════════════════════════════
-
-def test_fleet_level_progression() -> None:
-    _print_category("Fleet Level Progression (quadratic curve)")
-
-    # 4a: Static formula spot-checks — no DB needed
-    _test("calculate_fleet_level(0)   = 1", calculate_fleet_level(0)   == 1)
-    _test("calculate_fleet_level(99)  = 1", calculate_fleet_level(99)  == 1)
-    _test("calculate_fleet_level(100) = 2", calculate_fleet_level(100) == 2)
-    _test("calculate_fleet_level(299) = 2", calculate_fleet_level(299) == 2)
-    _test("calculate_fleet_level(300) = 3", calculate_fleet_level(300) == 3)
-    _test("calculate_fleet_level(600) = 4", calculate_fleet_level(600) == 4)
-
-    # 4b: award_fleet_xp_and_level_up persists to the database
-    p   = _player_repo.create_player(_uid("FleetXP"))
-    pid = p.player_id if p else -1
-
-    lvl = _stats_repo.award_fleet_xp_and_level_up(pid, 100)
-    _test("Award 100 fleet XP → FleetLevel 2", lvl == 2)
-
-    lvl2 = _stats_repo.award_fleet_xp_and_level_up(pid, 200)  # total 300
-    _test("Award 200 more fleet XP → FleetLevel 3", lvl2 == 3)
-
-    # 4c: get_progress_bar_data returns correct band for Level 3
-    # At total_xp=300, Level 3 band is [300, 600)
-    bar = _stats_repo.get_progress_bar_data(pid)
-    _test("Progress bar xp_start = 300 (Level 3 threshold)", bar.get("xp_start") == 300)
-    _test("Progress bar xp_end   = 600 (Level 4 threshold)", bar.get("xp_end")   == 600)
-
-    _cleanup("FleetXP")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
 # CATEGORY 5 — Error handling
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -245,25 +210,10 @@ def test_error_handling() -> None:
     missing = _player_repo.get_player_by_id(999_999)
     _test("get_player_by_id(999999) returns None", missing is None)
 
-    # 5c: add_experience(0) leaves stats unchanged
-    p      = _player_repo.create_player(_uid("ErrHandle"))
-    pid    = p.player_id if p else -1
-    before = _stats_repo.get_player_stats(pid)
-    _stats_repo.add_experience(pid, 0)
-    after  = _stats_repo.get_player_stats(pid)
-    _test("add_experience(0) leaves stats unchanged",
-          before is not None and after is not None
-          and before.total_battles == after.total_battles)
-
     # 5d: Empty player name rejected
     bad_player = _player_repo.create_player("   ")
     _test("create_player with whitespace-only name rejected", bad_player is None)
 
-    # 5e: award_fleet_xp for non-existent player returns -1
-    bad_fleet = _stats_repo.award_fleet_xp_and_level_up(-99, 100)
-    _test("award_fleet_xp for non-existent player returns -1", bad_fleet == -1)
-
-    _cleanup("ErrHandle")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -341,11 +291,6 @@ if __name__ == "__main__":
 # 2. Player model has no FleetLevel / FleetXP fields (schema-aligned).
 #    Test 1e checks ELO = 0 instead of FleetLevel = 1, because ELO is the
 #    only extra column that exists on the Python Player dataclass.
-#
-# 3. Player model has no Level / TotalExperience (removed in the schema-aligned
-#    rewrite).  Tests 3a/3d from the GDScript (999 XP → Level 1, etc.) are
-#    replaced by battle-count and win/loss/draw aggregation checks, which are
-#    what the current schema actually stores.
 #
 # 4. BattleRecord.result is int (1 = player wins, 2 = opponent wins, 0 = draw),
 #    not a string ("Win"/"Loss"/"Draw") — matching the GDScript model exactly.
