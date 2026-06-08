@@ -37,6 +37,7 @@ func login_user(username: String, password: String) -> Dictionary:
 			result["error"] = "Login succeeded but no access token was returned."
 		else:
 			NetworkManager.set_auth_token(token)
+			NetworkManager.logged_in_username = username
 	elif result.has("error"):
 		NetworkManager.clear_auth_token()
 

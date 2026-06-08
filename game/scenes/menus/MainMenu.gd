@@ -48,6 +48,10 @@ var _email_regex: RegEx
 @onready var _fleet_tree: Tree = %FleetTree
 @onready var _total_cost_label: Label = %TotalCostLabel
 @onready var _continue_button: Button = %ContinueButton
+@onready var _fleet_setup_title: Label = %Title
+@onready var _queue_overlay: Control = %QueueOverlay
+@onready var _queue_label: Label = %QueueLabel
+@onready var _cancel_queue_button: Button = %CancelQueueButton
 @onready var _weapon_buttons: VBoxContainer = %WeaponButtons
 @onready var _remove_ship_button: Button = %RemoveShipButton
 @onready var _weapon_panel_hint: Label = %WeaponPanelHint
@@ -56,6 +60,10 @@ var _tree_root: TreeItem
 var _fleet: Array[Dictionary] = []
 var _weapon_check_buttons: Dictionary = {}
 var _selected_fleet_index: int = -1
+var _selected_mode: String = ""
+var _local_setup_player: int = 1
+var _pvp_queue_aborted: bool = false
+const MATCH_PREP_SCENE := preload("res://scenes/match/MatchPrep.tscn")
 
 
 func _ready() -> void:
@@ -72,6 +80,7 @@ func _ready() -> void:
 	_update_weapon_panel()
 	_settings_panel.visible = false
 	_auth_panel.visible = false
+	_queue_overlay.visible = false
 	_show_login_form()
 
 
@@ -242,7 +251,12 @@ func _on_quit_pressed() -> void:
 	get_tree().quit()
 
 
-func _on_mode_selected(_mode: String) -> void:
+func _on_mode_selected(mode: String) -> void:
+	_selected_mode = mode
+	_local_setup_player = 1
+	MatchContext.clear_local_two_player_setup()
+	_reset_fleet_builder()
+	_configure_fleet_setup_header()
 	change_stage(2)
 
 
@@ -251,6 +265,13 @@ func _on_stage2_back_pressed() -> void:
 
 
 func _on_stage3_back_pressed() -> void:
+	if _selected_mode.to_lower() == "local" and _local_setup_player == 2:
+		_local_setup_player = 1
+		_restore_local_host_fleet()
+		_configure_fleet_setup_header()
+		return
+	MatchContext.clear_local_two_player_setup()
+	_local_setup_player = 1
 	change_stage(1)
 
 
@@ -481,10 +502,192 @@ func _update_cost_display() -> void:
 
 
 func _on_continue_pressed() -> void:
-	print(
-		"[Battlefleet] Fleet ready — sending to Python server: ",
-		_fleet,
-		" (total cost: ",
-		_get_total_cost(),
-		")"
+	var mode_key := _selected_mode.to_lower()
+	if mode_key.is_empty():
+		push_warning("[Battlefleet] Select a game mode first.")
+		return
+	if mode_key == "pvp" and not NetworkManager.is_logged_in():
+		print("[Battlefleet] Log in before playing PvP.")
+		return
+	if mode_key == "pve" and not NetworkManager.is_logged_in():
+		print("[Battlefleet] Log in before playing PvE.")
+		return
+
+	MatchContext.pending_mode = mode_key
+	MatchContext.mode = mode_key
+
+	if mode_key == "local":
+		await _continue_local_mode()
+		return
+
+	if mode_key == "pvp":
+		await _continue_pvp_mode()
+		return
+
+	MatchContext.set_local_fleet(_fleet, _get_total_cost())
+	await _go_to_match_prep()
+
+
+func _continue_local_mode() -> void:
+	if _local_setup_player == 1:
+		var host_name := _resolve_host_display_name()
+		MatchContext.save_local_host_fleet(_fleet, _get_total_cost(), host_name)
+		MatchContext.local_guest_display_name = "%s's guest" % host_name
+		_local_setup_player = 2
+		_reset_fleet_builder()
+		_configure_fleet_setup_header()
+		_reset_continue_button()
+		return
+
+	MatchContext.save_local_guest_fleet(_fleet, _get_total_cost())
+	MatchContext.set_local_fleet(
+		MatchContext.local_host_fleet,
+		MatchContext.local_host_fleet_total_cost
 	)
+	await _go_to_match_prep()
+
+
+func _continue_pvp_mode() -> void:
+	MatchContext.set_local_fleet(_fleet, _get_total_cost())
+	_pvp_queue_aborted = false
+	_continue_button.disabled = true
+	_continue_button.text = "Searching..."
+	_show_pvp_queue_overlay("Finding opponent (FastAPI queue)...")
+
+	var fleet_payload := NetworkManager.fleet_service.build_fleet_payload(
+		MatchContext.your_fleet,
+		MatchContext.your_fleet_total_cost
+	)
+
+	var join := await NetworkManager.matchmaking_service.join_queue("pvp", fleet_payload)
+	if _pvp_queue_aborted:
+		await NetworkManager.matchmaking_service.leave_queue()
+		_finish_pvp_queue_ui()
+		return
+	if not join.success:
+		_queue_label.text = "Queue failed: %s" % join.get("error", "")
+		await get_tree().create_timer(2.5).timeout
+		_finish_pvp_queue_ui()
+		return
+
+	var match_id := ""
+	if str(join.data.get("status", "")) == "matched":
+		match_id = str(join.data.get("match_id", ""))
+	else:
+		var poll := await NetworkManager.matchmaking_service.poll_until_matched()
+		if poll.get("cancelled", false):
+			await NetworkManager.matchmaking_service.leave_queue()
+			_finish_pvp_queue_ui()
+			return
+		if not poll.success:
+			_queue_label.text = "Matchmaking failed: %s" % poll.get("error", "")
+			await get_tree().create_timer(2.5).timeout
+			await NetworkManager.matchmaking_service.leave_queue()
+			_finish_pvp_queue_ui()
+			return
+		match_id = str(poll.match_id)
+
+	var fetch := await NetworkManager.match_service.fetch_match(match_id)
+	_queue_overlay.visible = false
+	if not fetch.success:
+		_queue_label.text = "Could not load match."
+		_queue_overlay.visible = true
+		await get_tree().create_timer(2.0).timeout
+		_finish_pvp_queue_ui()
+		return
+
+	_finish_pvp_queue_ui()
+	await _go_to_match_prep()
+
+
+func _show_pvp_queue_overlay(message: String) -> void:
+	_queue_label.text = message
+	_cancel_queue_button.disabled = false
+	_queue_overlay.visible = true
+
+
+func _on_cancel_queue_pressed() -> void:
+	if not _queue_overlay.visible:
+		return
+	_pvp_queue_aborted = true
+	_cancel_queue_button.disabled = true
+	_queue_label.text = "Leaving queue..."
+	NetworkManager.matchmaking_service.request_poll_cancel()
+
+
+func _finish_pvp_queue_ui() -> void:
+	_pvp_queue_aborted = false
+	NetworkManager.matchmaking_service.reset_poll_cancel()
+	_queue_overlay.visible = false
+	_cancel_queue_button.disabled = false
+	_reset_continue_button()
+
+
+func _go_to_match_prep() -> void:
+	_continue_button.disabled = true
+	_continue_button.text = "Loading..."
+	await get_tree().process_frame
+	get_tree().change_scene_to_packed(MATCH_PREP_SCENE)
+
+
+func _resolve_host_display_name() -> String:
+	if NetworkManager.logged_in_username != "":
+		return NetworkManager.logged_in_username
+	return "Guest"
+
+
+func _configure_fleet_setup_header() -> void:
+	if _selected_mode.to_lower() != "local":
+		_fleet_setup_title.text = "Fleet Builder — %s" % _selected_mode
+		return
+	if _local_setup_player == 1:
+		_fleet_setup_title.text = "Player 1 — %s" % _resolve_host_display_name()
+	else:
+		_fleet_setup_title.text = "Player 2 — %s" % MatchContext.local_guest_display_name
+
+
+func _reset_fleet_builder() -> void:
+	_fleet.clear()
+	_selected_fleet_index = -1
+	var ship_item := _tree_root.get_first_child()
+	while ship_item != null:
+		var next := ship_item.get_next()
+		ship_item.free()
+		ship_item = next
+	_update_weapon_panel()
+	_update_cost_display()
+
+
+func _restore_local_host_fleet() -> void:
+	_fleet.clear()
+	for ship in MatchContext.local_host_fleet:
+		_fleet.append(ship.duplicate(true))
+	_selected_fleet_index = -1
+	_rebuild_fleet_tree_from_fleet()
+	_update_weapon_panel()
+	_update_cost_display()
+
+
+func _rebuild_fleet_tree_from_fleet() -> void:
+	var ship_item := _tree_root.get_first_child()
+	while ship_item != null:
+		var next := ship_item.get_next()
+		ship_item.free()
+		ship_item = next
+
+	for fleet_index in _fleet.size():
+		var ship: Dictionary = _fleet[fleet_index]
+		var ship_name: String = ship["name"]
+		var new_ship_item := _fleet_tree.create_item(_tree_root)
+		new_ship_item.set_text(0, _format_ship_label(ship_name))
+		new_ship_item.set_metadata(0, fleet_index)
+		for weapon_name in ship["weapons"]:
+			var weapon_item := _fleet_tree.create_item(new_ship_item)
+			weapon_item.set_text(0, "%s (%d pts)" % [weapon_name, WEAPON_DATA[weapon_name]])
+			weapon_item.set_metadata(0, fleet_index)
+	_refresh_fleet_tree_styles()
+
+
+func _reset_continue_button() -> void:
+	_continue_button.text = "Continue"
+	_update_cost_display()
