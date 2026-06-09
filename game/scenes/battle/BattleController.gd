@@ -17,6 +17,7 @@ const SHIP_MAX_HP: Dictionary = {
 }
 
 const NAVAL_MOVER_SCENE := preload("res://scenes/battle/BattleNavalShipAdapter.tscn")
+const RANGE_RING_SCENE := preload("res://scenes/movement_test/RangeRing.tscn")
 
 @onready var _viewport_container: SubViewportContainer = $ViewportContainer
 @onready var _map_anchor: Node3D = %MapAnchor
@@ -30,12 +31,16 @@ const NAVAL_MOVER_SCENE := preload("res://scenes/battle/BattleNavalShipAdapter.t
 @onready var _round_label: Label = %RoundLabel
 @onready var _timer_label: Label = %TimerLabel
 @onready var _end_turn_button: Button = %EndTurnButton
-@onready var _movement_panel: MovementController3D = $UI/BattleMovementPanel
+@onready var _movement_panel: BattleMovementController = $UI/BattleMovementPanel
 @onready var _movement_cancel_button: Button = $UI/BattleMovementPanel/VBoxContainer/CancelButton
 
 var _terrain: MeshInstance3D
+var _fog_of_war: FogOfWar
 var _player_ships: Array = []
+var _enemy_markers: Array[Node3D] = []
+var _enemy_ships: Array = []
 var _ship_movers: Dictionary = {}
+var _range_ring: RangeRing
 var _turn_seconds_left: int = TURN_TIME_SEC
 var _turn_timer: Timer
 var _selected_ship_index: int = -1
@@ -67,11 +72,14 @@ func _ready() -> void:
 		_ship_action_menu.hide_menu()
 		return
 
+	add_to_group("battle_controller")
 	call_deferred("_build_battlefield")
 
 
 func _process(_delta: float) -> void:
 	_sync_movers_to_markers()
+	_update_fog_camera()
+	_update_enemy_fog_visibility()
 
 
 func _build_battlefield() -> void:
@@ -86,6 +94,7 @@ func _build_battlefield() -> void:
 	var built := MapGenerator.build_map(map_seed)
 	_map_anchor.add_child(built.root)
 	_terrain = built.terrain
+	_fog_of_war = built.get("fog") as FogOfWar
 
 	if _map_camera.has_method("setup_for_terrain"):
 		_map_camera.setup_for_terrain(_terrain)
@@ -98,7 +107,9 @@ func _build_battlefield() -> void:
 	_on_camera_zoom_changed(_map_camera.get_zoom_out_ratio() if _map_camera.has_method("get_zoom_out_ratio") else 0.0)
 
 	_player_ships = _spawn_player_fleet()
-	_spawn_fleet_markers(MatchContext.enemy_placements, _enemy_fleet(), ENEMY_COLOR)
+	_register_player_ships_with_fog()
+	_enemy_ships = _spawn_enemy_fleet()
+	_setup_range_ring()
 
 	_fleet_panel.populate_ships(_player_ships)
 	_begin_player_round()
@@ -109,6 +120,75 @@ func _build_battlefield() -> void:
 
 	_start_turn_timer()
 	_loading_overlay.visible = false
+
+
+func _register_player_ships_with_fog() -> void:
+	if _fog_of_war == null:
+		return
+	for ship in _player_ships:
+		var marker: Node3D = ship.get("marker")
+		if marker:
+			_fog_of_war.register_ship(marker)
+
+
+func _update_fog_camera() -> void:
+	if _fog_of_war and _map_camera:
+		_fog_of_war.follow_camera(_map_camera)
+
+
+func _update_enemy_fog_visibility() -> void:
+	if _fog_of_war == null:
+		return
+	for marker in _enemy_markers:
+		if not is_instance_valid(marker):
+			continue
+		marker.visible = _fog_of_war.is_world_position_visible(marker.global_position)
+
+
+func _setup_range_ring() -> void:
+	_range_ring = RANGE_RING_SCENE.instantiate() as RangeRing
+	_range_ring.name = "RangeRing"
+	_range_ring.ring_radius = BattleTurnManager.MAX_MOVE_DISTANCE
+	_range_ring.visible = false
+	_ship_markers.add_child(_range_ring)
+
+
+func _spawn_enemy_fleet() -> Array:
+	var ships: Array = []
+	var fleet: Array = _enemy_fleet()
+	var placements: Array = MatchContext.enemy_placements
+	var name_counts: Dictionary = {}
+
+	for placement in placements:
+		if not placement is Dictionary:
+			continue
+		var ship_index := int(placement.get("ship_index", 0))
+		var ship_name := str(placement.get("ship_name", _fleet_ship_name(fleet, ship_index)))
+		name_counts[ship_name] = int(name_counts.get(ship_name, 0)) + 1
+		var display_name := "%s #%d" % [ship_name, name_counts[ship_name]]
+		var max_hp := int(SHIP_MAX_HP.get(ship_name, 100))
+		var world := _placement_to_world(placement)
+		var marker := _create_ship_marker(placement, ship_index, ship_name, ENEMY_COLOR, "enemy")
+		_enemy_markers.append(marker)
+
+		var weapons: Array = []
+		if ship_index >= 0 and ship_index < fleet.size() and fleet[ship_index] is Dictionary:
+			weapons = fleet[ship_index].get("weapons", [])
+
+		var ship_state := {
+			"ship_index": ship_index,
+			"name": ship_name,
+			"display_name": display_name,
+			"weapons": weapons,
+			"hp": max_hp,
+			"max_hp": max_hp,
+			"world_pos": world,
+			"marker": marker,
+		}
+		BattleTurnManager.init_ship_round_state(ship_state)
+		ships.append(ship_state)
+
+	return ships
 
 
 func _spawn_player_fleet() -> Array:
@@ -132,7 +212,7 @@ func _spawn_player_fleet() -> Array:
 
 		var max_hp := int(SHIP_MAX_HP.get(ship_name, 100))
 		var world := _placement_to_world(placement)
-		var marker := _create_ship_marker(placement, ship_index, ship_name, FLEET_COLOR)
+		var marker := _create_ship_marker(placement, ship_index, ship_name, FLEET_COLOR, "player")
 
 		var ship_state := {
 			"ship_index": ship_index,
@@ -150,7 +230,12 @@ func _spawn_player_fleet() -> Array:
 	return ships
 
 
-func _spawn_fleet_markers(placements: Array, fleet: Array, color: Color) -> void:
+func _spawn_fleet_markers(
+	placements: Array,
+	fleet: Array,
+	color: Color,
+	track_enemy_markers: bool = false
+) -> void:
 	if _terrain == null:
 		return
 	for entry in placements:
@@ -158,7 +243,9 @@ func _spawn_fleet_markers(placements: Array, fleet: Array, color: Color) -> void
 			continue
 		var ship_index := int(entry.get("ship_index", 0))
 		var ship_name := str(entry.get("ship_name", _fleet_ship_name(fleet, ship_index)))
-		_create_ship_marker(entry, ship_index, ship_name, color)
+		var marker := _create_ship_marker(entry, ship_index, ship_name, color, "enemy")
+		if track_enemy_markers:
+			_enemy_markers.append(marker)
 
 
 func _fleet_ship_name(fleet: Array, ship_index: int) -> String:
@@ -178,7 +265,13 @@ func _enemy_fleet() -> Array:
 	return []
 
 
-func _create_ship_marker(entry: Dictionary, ship_index: int, ship_name: String, color: Color) -> Node3D:
+func _create_ship_marker(
+	entry: Dictionary,
+	ship_index: int,
+	ship_name: String,
+	color: Color,
+	team: String
+) -> Node3D:
 	var world := _placement_to_world(entry)
 	var marker := BattleShipVisual.spawn_marker(
 		ship_name,
@@ -188,6 +281,8 @@ func _create_ship_marker(entry: Dictionary, ship_index: int, ship_name: String, 
 	)
 	marker.name = "ShipMarker_%d" % ship_index
 	marker.set_meta("ship_index", ship_index)
+	marker.set_meta("team", team)
+	marker.add_to_group("battle_ships")
 	_ship_markers.add_child(marker)
 	BattleShipVisual.finalize_marker(marker)
 	return marker
@@ -224,6 +319,9 @@ func _select_ship(ship_index: int, glide_camera: bool = false) -> void:
 	_selected_ship_index = ship_index
 	_fleet_panel.highlight_ship(ship_index)
 	_update_marker_highlights(ship_index)
+	var marker: Node3D = ship.get("marker")
+	if _range_ring and marker:
+		_range_ring.attach_to_ship(marker)
 
 	var screen_pos := _world_to_screen(ship.get("world_pos", Vector3.ZERO))
 	_ship_action_menu.show_for_ship(ship, screen_pos)
@@ -236,6 +334,8 @@ func _deselect_ship() -> void:
 	_selected_ship_index = -1
 	_fleet_panel.highlight_ship(-1)
 	_update_marker_highlights(-1)
+	if _range_ring:
+		_range_ring.detach()
 	_ship_action_menu.hide_menu()
 
 
@@ -338,14 +438,22 @@ func _run_ai_turn_stub() -> void:
 	_is_ai_turn = true
 	_update_round_label()
 
-	var package := BattleTurnManager.build_turn_package(
-		MatchContext.match_id,
-		_round_number,
-		MatchContext.local_username,
-		_player_ships
-	)
-	print("[Battle] Turn package for FastAPI (stub):")
-	print(JSON.stringify(package))
+	var ai_request := BattleTurnManager.build_ai_turn_request({
+		"match_id": MatchContext.match_id,
+		"round": _round_number,
+		"mode": MatchContext.mode,
+		"human_player": MatchContext.local_username,
+		"ai_player": MatchContext.opponent_username,
+		"map_seed": MatchContext.get_battlefield_map_seed(),
+		"map_size": float(_terrain.size) if _terrain else 1024.0,
+		"water_surface_y": WATER_SURFACE_Y,
+		"vision_radius": _fog_of_war.vision_radius if _fog_of_war else 0.0,
+		"fog_of_war": _fog_of_war,
+		"human_fleet": _player_ships,
+		"ai_fleet": _enemy_ships,
+	})
+	print("[Battle] AI turn request for FastAPI:")
+	print(JSON.stringify(ai_request, "\t"))
 
 	await get_tree().create_timer(1.2).timeout
 
@@ -412,22 +520,79 @@ func _get_or_create_mover(ship_index: int, ship: Dictionary) -> BattleNavalShipA
 		var marker: Node3D = ship.get("marker")
 		if marker:
 			existing.configure_from_marker(marker)
+		if _terrain:
+			existing.configure_battle(ship_index, _terrain, float(_terrain.size))
+		_wire_mover_collision(existing, ship_index)
 		return existing
 
 	var marker: Node3D = ship.get("marker")
 	var mover := NAVAL_MOVER_SCENE.instantiate() as BattleNavalShipAdapter
 	mover.name = "Mover_%d" % ship_index
+	mover.set_meta("ship_index", ship_index)
+	mover.set_meta("team", "player")
 	_ship_markers.add_child(mover)
 	if marker:
 		mover.configure_from_marker(marker)
+	if _terrain:
+		mover.configure_battle(ship_index, _terrain, float(_terrain.size))
+	_wire_mover_collision(mover, ship_index)
 	_ship_movers[ship_index] = mover
 	return mover
+
+
+func _wire_mover_collision(mover: BattleNavalShipAdapter, ship_index: int) -> void:
+	mover.collision_report = func(
+		kind: String,
+		damage: int,
+		other_ship_index: int,
+		other_team: String
+	) -> void:
+		_on_mover_collision(ship_index, kind, damage, other_ship_index, other_team)
 
 
 func _reset_ship_movers_for_new_turn() -> void:
 	for mover in _ship_movers.values():
 		if mover is NavalShip3D:
 			(mover as NavalShip3D).reset_turn_actions()
+
+
+func _on_mover_collision(
+	ship_index: int,
+	kind: String,
+	damage: int,
+	other_ship_index: int,
+	other_team: String = ""
+) -> void:
+	_apply_ship_damage("player", ship_index, damage, kind)
+	if kind == "ship" and other_ship_index >= 0:
+		var team := other_team if other_team != "" else "enemy"
+		_apply_ship_damage(team, other_ship_index, damage, kind)
+
+
+func apply_collision_damage(
+	team: String,
+	ship_index: int,
+	damage: int,
+	kind: String = ""
+) -> void:
+	_apply_ship_damage(team, ship_index, damage, kind)
+
+
+func _apply_ship_damage(team: String, ship_index: int, damage: int, kind: String = "") -> void:
+	if ship_index < 0 or damage <= 0:
+		return
+	var ships: Array = _player_ships if team == "player" else _enemy_ships
+	for ship in ships:
+		if int(ship.get("ship_index", -1)) != ship_index:
+			continue
+		ship["hp"] = maxi(0, int(ship.get("hp", 0)) - damage)
+		if team == "player":
+			_fleet_panel.update_ship_health(ship_index, int(ship["hp"]), int(ship.get("max_hp", 100)))
+			_fleet_panel.update_ship_status(ship_index, ship)
+		print("[Battle] %s ship #%d took %d %s damage (%d HP left)" % [
+			team, ship_index, damage, kind, int(ship["hp"])
+		])
+		return
 
 
 func _sync_movers_to_markers() -> void:

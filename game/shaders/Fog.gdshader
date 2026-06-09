@@ -18,13 +18,16 @@ void vertex() {
 
 void fragment() {
     vec2 fog_uv = (world_xz / map_size) + 0.5;
-    float mask_val = texture(fog_mask, fog_uv).r;
+    float outside_map = max(max(-fog_uv.x, fog_uv.x - 1.0), max(-fog_uv.y, fog_uv.y - 1.0));
+    float mask_val = outside_map > 0.0 ? 0.0 : texture(fog_mask, fog_uv).r;
     vec4 noise_val = texture(noise_texture, fog_uv);
 
     float base_thickness = clamp(noise_val.r * fog_density, 0.0, 1.0);
     float noise_alpha = max(baseline_opacity, base_thickness);
 
-    float visibility_alpha = 1.0 - mask_val;
+    float cleared = smoothstep(0.05, 0.92, mask_val);
+    float visibility_alpha = 1.0 - cleared;
+    visibility_alpha = max(visibility_alpha, smoothstep(0.0, 0.06, outside_map));
 
     float final_alpha = visibility_alpha * noise_alpha * fog_color.a;
 

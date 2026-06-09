@@ -46,6 +46,17 @@ static func finalize_marker(marker: Node3D) -> void:
 	_scale_model(model, ship_name)
 	_align_model_on_water(model, marker, ship_name)
 	_apply_team_tint(marker, team_color, false)
+	add_facing_arrow(marker)
+
+
+static func add_facing_arrow(marker: Node3D) -> void:
+	if marker == null or marker.get_node_or_null("FacingArrow") != null:
+		return
+	var team_color: Color = marker.get_meta("team_color", Color.WHITE)
+	var arrow := ShipFacingArrow.new()
+	arrow.name = "FacingArrow"
+	arrow.setup(team_color)
+	marker.add_child(arrow)
 
 
 static func set_highlight(marker: Node3D, selected: bool) -> void:
@@ -98,6 +109,7 @@ static func _align_model_on_water(model: Node3D, marker: Node3D, ship_name: Stri
 	model.position.y += HULL_WATER_CLEARANCE
 	if ship_name == "Plane":
 		model.position.y += PLANE_FLOAT_HEIGHT
+		model.rotation_degrees.y += 180.0
 
 
 static func _combined_aabb_in_space(model: Node3D, space_root: Node3D) -> AABB:

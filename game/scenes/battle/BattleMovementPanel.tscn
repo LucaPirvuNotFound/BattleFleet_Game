@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://battle_movement_panel"]
 
-[ext_resource type="Script" path="res://scenes/movement_test/movement_controller_3d.gd" id="1_move_ctrl"]
+[ext_resource type="Script" path="res://scripts/battle/BattleMovementController.gd" id="1_move_ctrl"]
+[ext_resource type="Script" path="res://scripts/battle/CompassAnglePicker.gd" id="2_compass"]
 
 [node name="BattleMovementPanel" type="Control"]
 unique_name_in_owner = true
@@ -12,7 +13,7 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -170.0
-offset_top = -300.0
+offset_top = -320.0
 offset_right = 170.0
 offset_bottom = -16.0
 grow_horizontal = 2
@@ -46,14 +47,15 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Select movement"
 
+[node name="CompassAnglePicker" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 118)
+layout_mode = 2
+script = ExtResource("2_compass")
+
 [node name="AngleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+horizontal_alignment = 1
 text = "Angle: 0°"
-
-[node name="AngleSlider" type="HSlider" parent="VBoxContainer"]
-layout_mode = 2
-min_value = -180.0
-max_value = 180.0
 
 [node name="DistanceLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -61,41 +63,12 @@ text = "Distance: 0"
 
 [node name="DistanceSlider" type="HSlider" parent="VBoxContainer"]
 layout_mode = 2
+min_value = -90.0
 max_value = 90.0
 
-[node name="MovePanel" type="PanelContainer" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MovePanel"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/MovePanel/VBoxContainer"]
-layout_mode = 2
-text = "Movement"
-
-[node name="ConfirmMoveButton" type="Button" parent="VBoxContainer/MovePanel/VBoxContainer"]
+[node name="ConfirmMoveButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Move!"
-
-[node name="FirePanel" type="PanelContainer" parent="VBoxContainer"]
-visible = false
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/FirePanel"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/FirePanel/VBoxContainer"]
-layout_mode = 2
-text = "Cannons"
-
-[node name="ConfirmFireButton" type="Button" parent="VBoxContainer/FirePanel/VBoxContainer"]
-layout_mode = 2
-text = "Fire!"
-
-[node name="EndTurnButton" type="Button" parent="VBoxContainer"]
-visible = false
-layout_mode = 2
-text = "End Turn"
 
 [node name="CancelButton" type="Button" parent="VBoxContainer"]
 unique_name_in_owner = true

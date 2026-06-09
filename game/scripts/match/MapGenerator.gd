@@ -3,6 +3,7 @@ class_name MapGenerator
 
 const WATER_SCENE := preload("res://scenes/WaterPlane.tscn")
 const TERRAIN_SCENE := preload("res://scenes/Terrain.tscn")
+const FOG_SCENE := preload("res://scenes/FogOfWar.tscn")
 
 ## Same layout as res://scenes/Map.tscn (water + procedural terrain).
 const WATER_TRANSFORM := Transform3D(
@@ -34,10 +35,18 @@ static func build_map(map_seed: int) -> Dictionary:
 	terrain.transform = TERRAIN_TRANSFORM
 	map_root.add_child(terrain)
 
+	var fog: FogOfWar = FOG_SCENE.instantiate()
+	fog.name = "FogOfWar"
+	fog.vision_radius = maxf(float(terrain.size) * 0.28, 120.0)
+	fog.fog_height = 12.0
+	fog.setup(float(terrain.size))
+	map_root.add_child(fog)
+
 	return {
 		"root": map_root,
 		"terrain": terrain,
 		"water": water,
+		"fog": fog,
 	}
 
 

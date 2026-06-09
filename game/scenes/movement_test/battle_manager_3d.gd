@@ -11,6 +11,10 @@ var current_turn: int = 0
 var current_ship_index: int = 0
 var _movement_controller: MovementController3D
 
+@export var range_ring_scene: PackedScene
+
+var _range_ring: RangeRing
+
 
 func _ready() -> void:
     _movement_controller = find_child("MovementController3D", true, false)
@@ -23,6 +27,10 @@ func _ready() -> void:
     _movement_controller.fire_confirmed.connect(_on_fire_confirmed)
     _movement_controller.turn_ended.connect(_on_turn_ended)
 
+    if range_ring_scene:
+        _range_ring = range_ring_scene.instantiate() as RangeRing
+        add_child(_range_ring)
+
     start_next_ship_turn()
 
 
@@ -34,6 +42,10 @@ func start_next_ship_turn() -> void:
 
     var ship = _current_ship()
     ship.reset_turn_actions()
+
+    if _range_ring:
+        _range_ring.attach_to_ship(ship)
+
     ship_turn_started.emit(ship)
     _movement_controller.set_selected_ship(ship)
 

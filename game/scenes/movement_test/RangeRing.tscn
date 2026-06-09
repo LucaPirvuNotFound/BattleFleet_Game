@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://1br5leac2kwi"]
+
+[ext_resource type="Script" path="res://scenes/movement_test/range_ring.gd" id="1_eo55p"]
+
+[node name="RangeRing" type="Node3D"]
+script = ExtResource("1_eo55p")
+ring_radius = 90.0
+ring_thickness = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
