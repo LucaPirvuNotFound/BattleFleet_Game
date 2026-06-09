@@ -32,8 +32,6 @@ const COIN_LAND_RED_X := PI
 @onready var _matchmaking_overlay: Control = %MatchmakingOverlay
 @onready var _matchmaking_label: Label = %MatchmakingLabel
 
-@onready var _minimap: Control = %Minimap
-
 var _map_root: Node3D
 var _terrain: MeshInstance3D
 var _water: Node3D

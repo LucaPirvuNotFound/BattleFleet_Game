@@ -10,5 +10,7 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - BATTLEFLEET_SECRET_KEY=dev_secret_key_here
+      # Ollama on Pi often hangs; fall back to rule-based AI after 12s. Set SKIP_OLLAMA=true to skip LLM entirely.
+      - OLLAMA_TIMEOUT_SEC=12
     volumes:
       - ./instance:/app/backend/instance

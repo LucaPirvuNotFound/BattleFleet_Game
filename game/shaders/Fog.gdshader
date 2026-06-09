@@ -22,7 +22,7 @@ void fragment() {
     float mask_val = outside_map > 0.0 ? 0.0 : texture(fog_mask, fog_uv).r;
     vec4 noise_val = texture(noise_texture, fog_uv);
 
-    float base_thickness = clamp(noise_val * fog_density, 0.0, 1.0);
+    float base_thickness = clamp(noise_val.r * fog_density, 0.0, 1.0);
     float noise_alpha = max(baseline_opacity, base_thickness);
 
     float cleared = smoothstep(0.05, 0.92, mask_val);
@@ -31,6 +31,6 @@ void fragment() {
 
     float final_alpha = visibility_alpha * noise_alpha * fog_color.a;
 
-    ALBEDO = fog_color.rgb * noise_val;
+    ALBEDO = fog_color.rgb * noise_val.rgb;
     ALPHA = final_alpha;
 }

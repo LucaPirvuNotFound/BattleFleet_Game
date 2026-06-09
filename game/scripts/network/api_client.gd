@@ -3,20 +3,17 @@ class_name ApiClient
 
 const BASE_URL := "http://battlefeet.go.ro:8001"
 
-var _http: HTTPRequest
-
-
-func _ready() -> void:
-	_http = HTTPRequest.new()
-	_http.timeout = 30.0
-	add_child(_http)
-
-
 func send_request(
 	endpoint: String,
 	method: HTTPClient.Method,
-	body: Dictionary = {}
+	body: Dictionary = {},
+	timeout_sec: float = 30.0
 ) -> Dictionary:
+	# Per-request HTTPRequest so long AI calls do not block other API traffic.
+	var http := HTTPRequest.new()
+	http.timeout = timeout_sec
+	add_child(http)
+
 	var url := BASE_URL + endpoint
 	var headers := PackedStringArray([
 		"Content-Type: application/json",
@@ -30,8 +27,9 @@ func send_request(
 	if not body.is_empty():
 		payload = JSON.stringify(body)
 
-	var request_err := _http.request(url, headers, method, payload)
+	var request_err := http.request(url, headers, method, payload)
 	if request_err != OK:
+		http.queue_free()
 		return {
 			"success": false,
 			"status": 0,
@@ -39,7 +37,9 @@ func send_request(
 			"error": "Failed to start HTTP request (%s)." % error_string(request_err),
 		}
 
-	var completed: Array = await _http.request_completed
+	var completed: Array = await http.request_completed
+	http.queue_free()
+
 	var result: int = completed[0]
 	var response_code: int = completed[1]
 	var response_body: PackedByteArray = completed[3]

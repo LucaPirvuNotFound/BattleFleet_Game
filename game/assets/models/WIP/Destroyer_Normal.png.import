@@ -3,16 +3,16 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://didyn5hypppin"
-path.etc2="res://.godot/imported/Destroyer_Normal.png-c06eae12fe88a80525ff877488db0706.etc2.ctex"
+path.s3tc="res://.godot/imported/Destroyer_Normal.png-c06eae12fe88a80525ff877488db0706.s3tc.ctex"
 metadata={
-"imported_formats": ["etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/models/WIP/Destroyer_Normal.png"
-dest_files=["res://.godot/imported/Destroyer_Normal.png-c06eae12fe88a80525ff877488db0706.etc2.ctex"]
+dest_files=["res://.godot/imported/Destroyer_Normal.png-c06eae12fe88a80525ff877488db0706.s3tc.ctex"]
 
 [params]
 

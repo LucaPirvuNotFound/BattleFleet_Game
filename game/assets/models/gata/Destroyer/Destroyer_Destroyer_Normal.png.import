@@ -3,9 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b0er3ppr1tjyr"
-path.etc2="res://.godot/imported/Destroyer_Destroyer_Normal.png-52a2bd150f10a583de9710d2f7c26179.etc2.ctex"
+path.s3tc="res://.godot/imported/Destroyer_Destroyer_Normal.png-52a2bd150f10a583de9710d2f7c26179.s3tc.ctex"
 metadata={
-"imported_formats": ["etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/gata/Destroyer/Destroyer_Destroyer_Normal.png"
-dest_files=["res://.godot/imported/Destroyer_Destroyer_Normal.png-52a2bd150f10a583de9710d2f7c26179.etc2.ctex"]
+dest_files=["res://.godot/imported/Destroyer_Destroyer_Normal.png-52a2bd150f10a583de9710d2f7c26179.s3tc.ctex"]
 
 [params]
 

@@ -1,9 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
+import json
+import logging
 import os
 
 from services.ai_service import get_admiral_decision, get_narrator_commentary
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
@@ -13,6 +17,28 @@ class GameStatePayload(BaseModel):
 class NarratorPayload(BaseModel):
     game_state: Dict[str, Any]
     instruction_text: Optional[str] = "You are Snoop Dogg acting as a naval deck officer. Warn the captain about the current situation using your signature style, slang, and laid-back attitude."
+
+@router.post("/admiral_turn")
+async def admiral_turn(payload: GameStatePayload):
+    """
+    PvE AI turn endpoint. Takes the serialized game state built by
+    BattleTurnManager.build_ai_turn_request and returns tactical decisions
+    in the form: { match_id, round, phase, actions: [ { ship_index, orders: [...] } ] }
+    """
+    try:
+        logger.info(
+            "admiral_turn request match=%s round=%s ai_ships=%d",
+            payload.game_state.get("match_id"),
+            payload.game_state.get("round"),
+            len(payload.game_state.get("ai_fleet", [])),
+        )
+        decision = await get_admiral_decision(payload.game_state)
+        logger.info("admiral_turn response: %s", json.dumps(decision)[:2000])
+        return decision
+    except Exception as e:
+        logger.exception("admiral_turn failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/test/admiral")
 async def test_admiral(payload: GameStatePayload):

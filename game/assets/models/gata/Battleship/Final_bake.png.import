@@ -3,16 +3,16 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://86npr8dm3o3a"
-path.etc2="res://.godot/imported/Final_bake.png-291c9db987a3b2bcae2db837307d8ac4.etc2.ctex"
+path.s3tc="res://.godot/imported/Final_bake.png-291c9db987a3b2bcae2db837307d8ac4.s3tc.ctex"
 metadata={
-"imported_formats": ["etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/models/gata/Battleship/Final_bake.png"
-dest_files=["res://.godot/imported/Final_bake.png-291c9db987a3b2bcae2db837307d8ac4.etc2.ctex"]
+dest_files=["res://.godot/imported/Final_bake.png-291c9db987a3b2bcae2db837307d8ac4.s3tc.ctex"]
 
 [params]
 
