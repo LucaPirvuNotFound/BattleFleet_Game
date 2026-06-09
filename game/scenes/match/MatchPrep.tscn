@@ -19,6 +19,11 @@ sky = SubResource("Sky_prep")
 ambient_light_source = 2
 ambient_light_color = Color(0.42, 0.55, 0.72, 1)
 ambient_light_energy = 0.6
+fog_enabled = true
+fog_density = 0.002
+fog_color = Color(0.6, 0.72, 0.82, 1)
+fog_height = 50.0
+fog_height_density = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.06, 0.1, 0.16, 0.92)
