@@ -9,28 +9,36 @@ class_name RangeRing
 
 
 func _ready() -> void:
-    _build_ring()
+	_build_ring()
 
 
-func attach_to_ship(ship: NavalShip3D) -> void:
-    # Reparent to the new ship and reset local position
-    if get_parent():
-        get_parent().remove_child(self)
-    ship.add_child(self)
-    position = Vector3.ZERO
+func attach_to_ship(ship: Node3D) -> void:
+	if get_parent():
+		get_parent().remove_child(self)
+	ship.add_child(self)
+	position = Vector3.ZERO
+	visible = true
+
+
+func detach() -> void:
+	visible = false
+	if get_parent():
+		get_parent().remove_child(self)
 
 
 func _build_ring() -> void:
-    var torus := TorusMesh.new()
-    torus.inner_radius = ring_radius - ring_thickness
-    torus.outer_radius = ring_radius + ring_thickness
-    torus.rings = 128
-    torus.ring_segments = 8
+	var torus := TorusMesh.new()
+	torus.inner_radius = ring_radius - ring_thickness
+	torus.outer_radius = ring_radius + ring_thickness
+	torus.rings = 128
+	torus.ring_segments = 8
 
-    var material := StandardMaterial3D.new()
-    material.albedo_color = ring_color
-    material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    torus.material = material
+	var material := StandardMaterial3D.new()
+	material.albedo_color = ring_color
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	torus.material = material
 
-    _mesh_instance.mesh = torus
+	_mesh_instance.mesh = torus
+	_mesh_instance.position.y = 0.1

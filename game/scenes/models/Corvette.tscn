@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://5gceoldkf58f"]
 
-[ext_resource type="PackedScene" uid="uid://boojvieqbna5x" path="res://assets/models/gata/Corvette/Corvette.gltf" id="1_ss3a1"]
-[ext_resource type="Script" uid="uid://be028p0dkkfvx" path="res://scripts/Ship.gd" id="2_tuvw5"]
+[ext_resource type="PackedScene" uid="uid://boojvieqbna5x" path="res://assets/models/gata/Corvette/Corvette.gltf" id="1_corvette"]
 
-[node name="Corvette2" instance=ExtResource("1_ss3a1")]
-script = ExtResource("2_tuvw5")
+[node name="Corvette" instance=ExtResource("1_corvette")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

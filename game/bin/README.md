@@ -1,24 +1,53 @@
-# Godot binary (local install)
+# Battle server (Godot)
 
-Place the **Godot 4.6** editor binary here (not committed). On Linux ARM64 (e.g. Raspberry Pi):
+The battle server must be running **before** you finish match prep (after the coin countdown the client connects on port **7777**).
 
-```bash
-cd game/bin
-curl -fsSL -o Godot_v4.6-stable_linux.arm64.zip \
-  https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.arm64.zip
-unzip Godot_v4.6-stable_linux.arm64.zip
-chmod +x Godot_v4.6-stable_linux.arm64
-ln -sf Godot_v4.6-stable_linux.arm64 godot
+## Option A — Godot Editor F5 (easiest)
+
+1. Start **FastAPI** (see below).
+2. Press **F5** in Godot (main scene).
+3. Play through menu → PvE → coin flip → countdown.
+
+In the editor, battle placement runs **in the same process** — you do **not** need a second window or F6.
+
+To test the real ENet server flow from the editor, run with user arg `--force-battle-server` and start `BattleServerMain` separately (F6).
+
+## Option B — PowerShell script (Windows)
+
+From the `game` folder:
+
+```powershell
+.\bin\start-battle-server.ps1
 ```
 
-From the repo root, run the client:
+If Godot is not found, set the path once:
 
-```bash
-./game/bin/godot --path game/
+```powershell
+$env:BATTLEFLEET_GODOT_EXE = "C:\path\to\Godot_v4.6-stable_win64.exe"
+.\bin\start-battle-server.ps1
 ```
 
-First run (or after cloning): import assets once:
+## Option C — Command line (Godot on PATH)
 
-```bash
-./game/bin/godot --path game/ --import
+```powershell
+godot --path . res://scenes/battle/BattleServerMain.tscn -- --battle-server --port 7777
 ```
+
+If you see `'godot' is not recognized`, use Option A or B, or add your Godot folder to Windows PATH.
+
+---
+
+# FastAPI (meta-game)
+
+From the `backend` folder:
+
+```powershell
+# Docker
+docker compose up --build
+
+# Or local Python
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8001
+```
+
+API: `http://127.0.0.1:8001`

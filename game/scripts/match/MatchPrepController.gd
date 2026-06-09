@@ -149,9 +149,36 @@ func _run_match_prep_flow() -> void:
 	await _build_map_phase()
 	await _run_coin_phase()
 
-	if MatchContext.is_active:
-		await NetworkManager.match_service.coin_ack(MatchContext.match_id)
+	if not MatchContext.is_active:
+		return
 
+	var coin_result := await NetworkManager.match_service.coin_ack(MatchContext.match_id)
+	if not coin_result.success:
+		await _show_flow_error("Coin ack failed: %s" % str(coin_result.get("error", "unknown")))
+		return
+
+	var handoff := await NetworkManager.match_service.request_battle_handoff(MatchContext.match_id)
+	if not handoff.success:
+		await _show_flow_error("Battle handoff failed: %s" % str(handoff.get("error", "unknown")))
+		return
+
+	_loading_overlay.visible = true
+	_loading_label.text = "Connecting to battle server..."
+	_loading_bar.value = 0.5
+	await get_tree().process_frame
+
+	var username := MatchContext.local_username
+	if username == "":
+		username = "Guest"
+
+	var join := await BattleNetwork.connect_and_join(handoff.data, username)
+	_loading_overlay.visible = false
+
+	if not join.success:
+		await _show_flow_error(str(join.get("error", "Could not join battle server.")))
+		return
+
+	MatchContext.apply_battle_state(join.data)
 	get_tree().change_scene_to_packed(BATTLE_SCENE)
 
 
@@ -171,9 +198,6 @@ func _build_map_phase() -> void:
 	_loading_bar.value = 0.0
 	await get_tree().process_frame
 
-	if MatchContext.map_seed == 0:
-		MatchContext.map_seed = randi()
-
 	_loading_bar.value = 0.25
 	await get_tree().process_frame
 
@@ -187,8 +211,8 @@ func _build_map_phase() -> void:
 	_loading_bar.value = 0.9
 	await get_tree().process_frame
 
-	_sync_terrain_to_server_seed()
-	_minimap.setup(_terrain, _terrain.size)
+	MatchContext.lock_battlefield_map()
+	_fit_camera_to_map()
 	_loading_bar.value = 1.0
 	await get_tree().create_timer(0.35).timeout
 	_loading_overlay.visible = false
@@ -365,17 +389,6 @@ func _configure_player_names_from_match() -> void:
 	_blue_name_label.text = MatchContext.blue_display_name
 
 
-func _sync_terrain_to_server_seed() -> void:
-	if _terrain == null or MatchContext.map_seed == 0:
-		return
-	if _terrain.noise:
-		var noise: FastNoiseLite = _terrain.noise.duplicate()
-		noise.seed = MatchContext.map_seed
-		_terrain.noise = noise
-	_terrain.update_mesh()
-	_fit_camera_to_map()
-
-
 func _get_coin_height() -> float:
 	if _terrain and _terrain.has_method("get_height"):
 		return maxf(22.0, _terrain.get_height(0.0, 0.0) + 16.0)
@@ -389,8 +402,8 @@ func _hide_all_overlays() -> void:
 	_matchmaking_overlay.visible = false
 
 
-func _process(_delta: float) -> void:
-	if not _water:
-		return
-	_water.position.x = _map_camera.global_position.x
-	_water.position.z = _map_camera.global_position.z
+func _show_flow_error(message: String) -> void:
+	_matchmaking_overlay.visible = true
+	_matchmaking_label.text = message
+	await get_tree().create_timer(3.0).timeout
+	get_tree().change_scene_to_packed(preload("res://scenes/menus/MainMenu.tscn"))

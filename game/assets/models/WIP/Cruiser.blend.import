@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://34q10s8juub6"
-path="res://.godot/imported/Cruiser.blend-79407aa5fe4ff851401ac7800e1b87e1.scn"
+valid=false
 
 [deps]
 
 source_file="res://assets/models/WIP/Cruiser.blend"
-dest_files=["res://.godot/imported/Cruiser.blend-79407aa5fe4ff851401ac7800e1b87e1.scn"]
 
 [params]
 
@@ -38,23 +37,3 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={}
-blender/nodes/visible=0
-blender/nodes/active_collection_only=false
-blender/nodes/punctual_lights=true
-blender/nodes/cameras=true
-blender/nodes/custom_properties=true
-blender/nodes/modifiers=1
-blender/meshes/colors=false
-blender/meshes/uvs=true
-blender/meshes/normals=true
-blender/meshes/export_geometry_nodes_instances=false
-blender/meshes/gpu_instances=false
-blender/meshes/tangents=true
-blender/meshes/skins=2
-blender/meshes/export_bones_deforming_mesh_only=false
-blender/materials/unpack_enabled=true
-blender/materials/export_materials=1
-blender/animation/limit_playback=true
-blender/animation/always_sample=true
-blender/animation/group_tracks=true
-gltf/naming_version=2
