@@ -1,0 +1,112 @@
+{
+  "game_state": {
+    "match_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "round": 1,
+    "phase": "request_ai_turn",
+    "mode": "pve",
+    "human_player": "andre",
+    "ai_player": "ai_admiral",
+    "map": {
+      "seed": 123456789,
+      "size": 1024.0,
+      "grid_max": 127,
+      "water_surface_y": 1.6
+    },
+    "rules": {
+      "max_move_distance": 90.0,
+      "move_angle_min": -90.0,
+      "move_angle_max": 90.0,
+      "moves_per_ship_per_round": 1,
+      "shots_per_weapon_per_round": 1,
+      "move_angle_relative_to_heading": true,
+      "coordinate_system": {
+        "world_origin": "map_center",
+        "heading_rotation_steps": "0=north(-Z), 1=west(-X), 2=south(+Z), 3=east(+X)",
+        "angle_convention": "0=ahead, negative=port, positive=starboard"
+      }
+    },
+    "fog_of_war": {
+      "vision_radius": 286.72,
+      "ai_uses_fog": true,
+      "human_ships_hidden_from_ai": 1
+    },
+    "weapons": [
+      { "name": "Light Cannon", "max_range": 200.0, "min_range": 0.0 },
+      { "name": "Anti-Air", "max_range": 150.0, "min_range": 0.0 },
+      { "name": "Torpedoes", "max_range": 120.0, "min_range": 0.0 },
+      { "name": "Heavy Battery", "max_range": 300.0, "min_range": 0.0 }
+    ],
+    "human_turn": {
+      "player": "andre",
+      "fleet": [
+        {
+          "ship_index": 0,
+          "name": "Destroyer",
+          "display_name": "Destroyer #1",
+          "hp": 100,
+          "max_hp": 100,
+          "position": {
+            "x": -120.5,
+            "y": 1.6,
+            "z": 80.25,
+            "heading_degrees": 0.0,
+            "rotation": 0
+          },
+          "can_move": false,
+          "can_fire": true,
+          "weapons": [
+            { "name": "Torpedoes", "max_range": 120.0, "min_range": 0.0, "available": true },
+            { "name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "available": false }
+          ],
+          "actions_this_round": [
+            { "type": "move", "angle": 45.0, "distance": 60.0 },
+            { "type": "fire", "weapon": "Light Cannon", "angle": -10.0, "distance": 150.0 }
+          ]
+        }
+      ]
+    },
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "Cruiser #1",
+        "hp": 140,
+        "max_hp": 140,
+        "position": {
+          "x": 200.0,
+          "y": 1.6,
+          "z": -50.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          { "name": "Heavy Battery", "max_range": 300.0, "min_range": 0.0, "available": true }
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Destroyer",
+        "display_name": "Destroyer #1",
+        "hp": 100,
+        "max_hp": 100,
+        "position": {
+          "x": -120.5,
+          "y": 1.6,
+          "z": 80.25,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": false,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": [],
+        "visible_to_ai": true
+      }
+    ]
+  }
+}

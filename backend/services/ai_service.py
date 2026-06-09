@@ -12,7 +12,29 @@ async def get_admiral_decision(game_context_json: dict) -> dict:
     """
     prompt = f"""
     You are the Enemy Admiral AI. Analyze the following game state and output your next move.
-    Respond ONLY with a valid JSON object containing 'target_x', 'target_y', and 'strategy'.
+    
+    Familiarize yourself with the following stats of each possible ship:
+    - Battleship: 12,000hp, 22 knots, armament: 3 heavy turrets, 4 light turrets, 2 torpedo launchers, can launch recon planes
+    - Cruiser: 9,000hp, 30 knots, armament: 3 medium turrets, 4 light turrets, 2 torpedo launchers
+    - Destroyer: 4,000hp, 35 knots, armament: 1 medium turret, 8 light turrets, 6 torpedo launchers
+    - Corvette: 1750hp, 35 knots, armament: 7 light turrets, 4 torpedo launchers
+    - Torpedo Boat: 300hp, 45 knots, armament: 1 light turret, 1 torpedo launcher
+    
+    Respond ONLY with a valid JSON object matching this exact expected format structure:
+    {{
+      "match_id": "<the_match_id>",
+      "round": <the_round_number>,
+      "phase": "ai_turn_end",
+      "actions": [
+        {{
+          "ship_index": <ship_index>,
+          "orders": [
+            {{ "type": "move", "angle": <float>, "distance": <float> }},
+            {{ "type": "fire", "weapon": "<weapon_name>", "angle": <float>, "distance": <float> }}
+          ]
+        }}
+      ]
+    }}
     
     Game State: {json.dumps(game_context_json)}
     """
