@@ -395,8 +395,8 @@ func _start_turn_timer() -> void:
 
 
 func _update_timer_label() -> void:
-	var minutes := _turn_seconds_left / 60
-	var seconds := _turn_seconds_left % 60
+	var minutes: int = _turn_seconds_left / 60
+	var seconds: int = _turn_seconds_left % 60
 	_timer_label.text = "%02d:%02d" % [minutes, seconds]
 
 
@@ -445,6 +445,7 @@ func _set_player_input_enabled(enabled: bool) -> void:
 func _run_ai_turn_stub() -> void:
 	_is_ai_turn = true
 	_update_round_label()
+	BattleTurnManager.reset_fleet_for_round(_enemy_ships)
 
 	var ai_request := BattleTurnManager.build_ai_turn_request({
 		"match_id": MatchContext.match_id,
@@ -460,21 +461,82 @@ func _run_ai_turn_stub() -> void:
 		"human_fleet": _player_ships,
 		"ai_fleet": _enemy_ships,
 	})
-	print("[Battle] AI turn request for FastAPI:")
-	print(JSON.stringify(ai_request, "\t"))
 
-	await get_tree().create_timer(1.2).timeout
-
-	var ai_response := {
-		"match_id": MatchContext.match_id,
-		"round": _round_number,
-		"phase": "ai_turn_end",
-		"action": "end_turn",
-	}
-	print("[Battle] AI response (stub):")
-	print(JSON.stringify(ai_response))
+	var response := await NetworkManager.ai_service.request_admiral_turn(ai_request)
+	if response.success:
+		await _execute_ai_actions(response.data)
+	else:
+		push_warning("[Battle] AI turn request failed: %s" % str(response.get("error", "unknown")))
+		await get_tree().create_timer(1.2).timeout
 
 	_is_ai_turn = false
+
+
+func _get_enemy_ship(ship_index: int) -> Dictionary:
+	for ship in _enemy_ships:
+		if int(ship.get("ship_index", -1)) == ship_index:
+			return ship
+	return {}
+
+
+func _execute_ai_actions(ai_response: Dictionary) -> void:
+	var actions: Array = ai_response.get("actions", [])
+	if actions.is_empty():
+		await get_tree().create_timer(0.8).timeout
+		return
+	for action in actions:
+		if not action is Dictionary:
+			continue
+		var ship_index: int = int(action.get("ship_index", -1))
+		if ship_index < 0:
+			continue
+		var enemy_ship := _get_enemy_ship(ship_index)
+		if enemy_ship.is_empty():
+			continue
+		var orders: Array = action.get("orders", [])
+		for order in orders:
+			if not order is Dictionary:
+				continue
+			var order_type: String = str(order.get("type", ""))
+			if order_type == "move":
+				_execute_ai_move(enemy_ship, float(order.get("angle", 0.0)), float(order.get("distance", 0.0)))
+				await get_tree().create_timer(0.8).timeout
+			elif order_type == "fire":
+				_execute_ai_fire(enemy_ship, str(order.get("weapon", "")), float(order.get("angle", 0.0)), float(order.get("distance", 0.0)))
+				await get_tree().create_timer(0.5).timeout
+
+
+func _execute_ai_move(ship: Dictionary, angle_deg: float, distance: float) -> void:
+	if distance <= 0.0:
+		return
+	var marker: Node3D = ship.get("marker")
+	if marker == null:
+		return
+	var forward := -marker.transform.basis.z
+	var right := marker.transform.basis.x
+	var angle_rad := deg_to_rad(angle_deg)
+	var move_dir := (forward * cos(angle_rad) + right * sin(angle_rad)).normalized()
+	var new_pos: Vector3 = ship.get("world_pos", Vector3.ZERO) + move_dir * distance
+	new_pos.y = WATER_SURFACE_Y
+	marker.global_position = new_pos
+	ship["world_pos"] = new_pos
+
+
+func _execute_ai_fire(ship: Dictionary, weapon_name: String, angle: float, distance: float) -> void:
+	if weapon_name.is_empty():
+		return
+	var marker: Node3D = ship.get("marker")
+	if marker == null:
+		return
+	var ship_index: int = int(ship.get("ship_index", -1))
+	BattleProjectileLauncher.fire(
+		marker,
+		weapon_name,
+		angle,
+		distance,
+		func(impact_pos: Vector3, fired_weapon: String, _hit_body: Object) -> void:
+			_on_weapon_impact(impact_pos, fired_weapon, ship_index, "enemy")
+	)
 
 
 func _on_fleet_ship_selected(ship_index: int) -> void:
@@ -526,9 +588,9 @@ func _on_movement_cancelled() -> void:
 func _get_or_create_mover(ship_index: int, ship: Dictionary) -> BattleNavalShipAdapter:
 	var existing := _ship_movers.get(ship_index) as BattleNavalShipAdapter
 	if existing != null:
-		var marker: Node3D = ship.get("marker")
-		if marker:
-			existing.configure_from_marker(marker)
+		var existing_marker: Node3D = ship.get("marker")
+		if existing_marker:
+			existing.configure_from_marker(existing_marker)
 		if _terrain:
 			existing.configure_battle(ship_index, _terrain, float(_terrain.size))
 		_wire_mover_collision(existing, ship_index)

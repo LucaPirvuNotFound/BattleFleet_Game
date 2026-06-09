@@ -17,6 +17,8 @@ var matchmaking_service: MatchmakingService
 
 var match_service: MatchService
 
+var ai_service: AiService
+
 
 
 var impl: Node = null
@@ -70,6 +72,16 @@ func _ready() -> void:
 	match_service.api_client = api_client
 
 	add_child(match_service)
+
+
+
+	ai_service = preload("res://scripts/network/ai_service.gd").new()
+
+	ai_service.name = "AiService"
+
+	ai_service.api_client = api_client
+
+	add_child(ai_service)
 
 
 

@@ -14,6 +14,20 @@ class NarratorPayload(BaseModel):
     game_state: Dict[str, Any]
     instruction_text: Optional[str] = "You are Snoop Dogg acting as a naval deck officer. Warn the captain about the current situation using your signature style, slang, and laid-back attitude."
 
+@router.post("/admiral_turn")
+async def admiral_turn(payload: GameStatePayload):
+    """
+    PvE AI turn endpoint. Takes the serialized game state built by
+    BattleTurnManager.build_ai_turn_request and returns tactical decisions
+    in the form: { match_id, round, phase, actions: [ { ship_index, orders: [...] } ] }
+    """
+    try:
+        decision = await get_admiral_decision(payload.game_state)
+        return decision
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/test/admiral")
 async def test_admiral(payload: GameStatePayload):
     """

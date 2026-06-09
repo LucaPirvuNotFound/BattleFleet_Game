@@ -175,7 +175,7 @@ func _get_visible_half_width(viewport_size: Vector2) -> float:
 	return tan(deg_to_rad(fov * 0.5)) * position.y * aspect
 
 
-func _get_visible_half_height(viewport_size: Vector2) -> float:
+func _get_visible_half_height(_viewport_size: Vector2) -> float:
 	if projection == PROJECTION_ORTHOGONAL:
 		return size
 	return tan(deg_to_rad(fov * 0.5)) * position.y
