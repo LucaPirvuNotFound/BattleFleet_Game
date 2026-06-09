@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://lp7jemi8sko0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_alpx5"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="TorusMesh" id="TorusMesh_5ic5b"]
+material = SubResource("StandardMaterial3D_alpx5")
+inner_radius = 0.9
+
+[node name="ImpactMarker" type="Node3D" unique_id=416879723]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=409827005]
+mesh = SubResource("TorusMesh_5ic5b")
