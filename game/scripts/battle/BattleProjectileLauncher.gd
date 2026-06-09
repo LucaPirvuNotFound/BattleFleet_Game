@@ -39,11 +39,10 @@ static func fire(
 		+ direction * SPAWN_FORWARD_OFFSET
 	)
 
-	var ship_flat := Vector3(firer.global_position.x, WATER_SURFACE_Y, firer.global_position.z)
-	var landing_pos := ship_flat + direction * clamped_distance
 	var flight_distance := maxf(clamped_distance - SPAWN_FORWARD_OFFSET, 12.0)
+	var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", GRAVITY))
 
-	var launch_speed := sqrt(flight_distance * GRAVITY / sin(2.0 * launch_angle_rad))
+	var launch_speed := sqrt(flight_distance * gravity / sin(2.0 * launch_angle_rad))
 	var launch_velocity := (
 		direction * launch_speed * cos(launch_angle_rad)
 		+ Vector3.UP * launch_speed * sin(launch_angle_rad)
@@ -66,9 +65,6 @@ static func fire(
 	battle_ball.set_meta("firer", firer)
 	battle_ball.firer_ship_index = firer_ship_index
 	battle_ball.world_parent = world_parent
-	battle_ball.target_distance = flight_distance
-	battle_ball.origin = Vector3(spawn_pos.x, WATER_SURFACE_Y, spawn_pos.z)
-	battle_ball.planned_landing = landing_pos
 	battle_ball.impact_marker_scene = IMPACT_SCENE
 	battle_ball.impact_radius = maxf(aoe_radius / 1.8, 4.0)
 	battle_ball.linear_velocity = launch_velocity

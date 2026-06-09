@@ -4,9 +4,6 @@ class_name BattleCannonBall
 signal landed(position: Vector3)
 signal hit_something(collider: Object, position: Vector3)
 
-var target_distance: float = 0.0
-var origin: Vector3 = Vector3.ZERO
-var planned_landing: Vector3 = Vector3.ZERO
 var impact_marker_scene: PackedScene
 var impact_radius: float = 5.0
 var firer_ship_index: int = -1
@@ -15,7 +12,9 @@ var world_parent: Node3D
 var _has_hit: bool = false
 var _grace_time: float = 0.2
 
-const VISUAL_SCALE := 8.0
+const VISUAL_SCALE := 3.0
+const IMPACT_MARKER_GROUP := "battle_impact_markers"
+const WATER_SURFACE_Y := 1.55
 
 
 func _ready() -> void:
@@ -40,12 +39,7 @@ func _physics_process(delta: float) -> void:
 	if _grace_time > 0.0:
 		return
 
-	var horizontal_traveled := Vector2(
-		global_position.x - origin.x,
-		global_position.z - origin.z
-	).length()
-
-	if horizontal_traveled >= target_distance:
+	if global_position.y <= WATER_SURFACE_Y and linear_velocity.y <= 0.0:
 		_on_landed()
 
 
@@ -55,8 +49,7 @@ func _on_body_entered(body: Node) -> void:
 	if _is_own_ship(body):
 		return
 	_has_hit = true
-	var impact_pos := global_position
-	impact_pos.y = 1.55
+	var impact_pos := _water_impact_position()
 	hit_something.emit(body, impact_pos)
 	_spawn_marker(impact_pos)
 	queue_free()
@@ -66,7 +59,7 @@ func _on_landed() -> void:
 	if _has_hit:
 		return
 	_has_hit = true
-	var impact_pos := _impact_position()
+	var impact_pos := _water_impact_position()
 	landed.emit(impact_pos)
 	_spawn_marker(impact_pos)
 	queue_free()
@@ -85,12 +78,8 @@ func _is_own_ship(body: Node) -> bool:
 	return false
 
 
-func _impact_position() -> Vector3:
-	if planned_landing != Vector3.ZERO:
-		return planned_landing
-	var pos := global_position
-	pos.y = 1.55
-	return pos
+func _water_impact_position() -> Vector3:
+	return Vector3(global_position.x, WATER_SURFACE_Y, global_position.z)
 
 
 func _spawn_marker(impact_pos: Vector3) -> void:
@@ -103,5 +92,6 @@ func _spawn_marker(impact_pos: Vector3) -> void:
 	else:
 		get_tree().root.add_child(marker)
 	marker.global_position = impact_pos
-	marker.global_position.y = 1.55
+	marker.global_position.y = WATER_SURFACE_Y
 	marker.scale = Vector3(impact_radius, 1.0, impact_radius)
+	marker.add_to_group(IMPACT_MARKER_GROUP)
