@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cdspqdinofb7l" path="res://scenes/VisionCircle.tscn" id="2_yyirk"]
 [ext_resource type="Shader" uid="uid://cwioc2ypejc3b" path="res://shaders/Fog.gdshader" id="4_tm3qm"]
 [ext_resource type="PackedScene" uid="uid://8i1mvv0xmuow" path="res://scenes/models/Battleship.tscn" id="6_41ykk"]
+[ext_resource type="PackedScene" path="res://scenes/Minimap.tscn" id="7_minimap"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_41ykk"]
 _surfaces = [{
@@ -75,3 +76,17 @@ color = Color(0, 0, 0, 1)
 
 [node name="battleship_hull" parent="." unique_id=1864170896 instance=ExtResource("6_41ykk")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 196.1445, 0, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="Minimap" parent="CanvasLayer" instance=ExtResource("7_minimap")]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -212.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 212.0
+grow_horizontal = 0

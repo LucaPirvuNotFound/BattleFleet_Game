@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/Minimap.gd" id="1_scene"]
+
+[node name="Minimap" type="SubViewportContainer"]
+layout_mode = 0
+stretch = true
+custom_minimum_size = Vector2(200, 200)
+script = ExtResource("1_scene")

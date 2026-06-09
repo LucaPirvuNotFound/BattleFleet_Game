@@ -32,6 +32,8 @@ const COIN_LAND_RED_X := PI
 @onready var _matchmaking_overlay: Control = %MatchmakingOverlay
 @onready var _matchmaking_label: Label = %MatchmakingLabel
 
+@onready var _minimap: Control = %Minimap
+
 var _map_root: Node3D
 var _terrain: MeshInstance3D
 var _water: Node3D
@@ -180,11 +182,13 @@ func _build_map_phase() -> void:
 	_terrain = built.terrain
 	_water = built.water
 	_map_anchor.add_child(_map_root)
+	_map_root.add_to_group("map")
 
 	_loading_bar.value = 0.9
 	await get_tree().process_frame
 
 	_sync_terrain_to_server_seed()
+	_minimap.setup(_terrain, _terrain.size)
 	_loading_bar.value = 1.0
 	await get_tree().create_timer(0.35).timeout
 	_loading_overlay.visible = false
