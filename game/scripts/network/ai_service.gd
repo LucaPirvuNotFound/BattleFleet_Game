@@ -3,14 +3,22 @@ class_name AiService
 
 var api_client: ApiClient
 
+var _admiral_http: HTTPRequest
 var _narrator_http: HTTPRequest
 var _audio_player: AudioStreamPlayer
 
+# Resolve calls awaiting _admiral_http
+var _admiral_resolve: Callable
+
 
 func _ready() -> void:
-	# Dedicated HTTP node for narrator so it runs in parallel with admiral requests.
+	_admiral_http = HTTPRequest.new()
+	_admiral_http.timeout = 300.0
+	add_child(_admiral_http)
+	_admiral_http.request_completed.connect(_on_admiral_completed)
+
 	_narrator_http = HTTPRequest.new()
-	_narrator_http.timeout = 90.0
+	_narrator_http.timeout = 300.0
 	add_child(_narrator_http)
 	_narrator_http.request_completed.connect(_on_narrator_completed)
 
@@ -21,27 +29,48 @@ func _ready() -> void:
 # ── Admiral turn ────────────────────────────────────────────────────────────────
 
 func request_admiral_turn(game_state: Dictionary) -> Dictionary:
-	var response := await api_client.send_request(
-		"/ai/admiral_turn",
-		HTTPClient.METHOD_POST,
-		{"game_state": game_state}
-	)
+	var url := api_client.BASE_URL + "/ai/admiral_turn"
+	var headers := _auth_headers()
+	var payload := JSON.stringify({"game_state": game_state})
+
+	var err := _admiral_http.request(url, headers, HTTPClient.METHOD_POST, payload)
+	if err != OK:
+		return {"success": false, "status": 0, "data": {}, "error": "Failed to start admiral request (%s)." % error_string(err)}
+
+	var completed: Array = await _admiral_http.request_completed
+	var result: int    = completed[0]
+	var code: int      = completed[1]
+	var body: PackedByteArray = completed[3]
+
+	if result != HTTPRequest.RESULT_SUCCESS:
+		return {"success": false, "status": code, "data": {}, "error": "Admiral HTTP transport error (result %d)." % result}
+
+	var text := body.get_string_from_utf8()
+	var data: Variant = JSON.parse_string(text)
+	if not data is Dictionary:
+		data = {}
+	var success := code >= 200 and code < 300
+	var response := {"success": success, "status": code, "data": data}
+	if not success:
+		response["error"] = str((data as Dictionary).get("detail", "Request failed with status %d." % code))
 	return response
+
+
+func _on_admiral_completed(_result: int, _code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
+	pass  # Handled inline via await in request_admiral_turn
 
 
 # ── Narrator turn (fire-and-forget) ─────────────────────────────────────────────
 
 func request_narrator_turn(game_state: Dictionary) -> void:
-	if _narrator_http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
-		return
-	var url := api_client.BASE_URL + "/ai/narrator_turn"
-	var headers := PackedStringArray([
-		"Content-Type: application/json",
-		"Accept: application/json",
-	])
-	if NetworkManager.auth_token != "":
-		headers.append("Authorization: Bearer %s" % NetworkManager.auth_token)
-	_narrator_http.request(url, headers, HTTPClient.METHOD_POST, JSON.stringify({"game_state": game_state}))
+	var err := _narrator_http.request(
+		api_client.BASE_URL + "/ai/narrator_turn",
+		_auth_headers(),
+		HTTPClient.METHOD_POST,
+		JSON.stringify({"game_state": game_state})
+	)
+	if err == ERR_BUSY:
+		return  # Previous narrator request still in flight
 
 
 func _on_narrator_completed(
@@ -70,3 +99,12 @@ func _on_narrator_completed(
 		_audio_player.stop()
 	_audio_player.stream = stream
 	_audio_player.play()
+
+
+# ── Helpers ──────────────────────────────────────────────────────────────────────
+
+func _auth_headers() -> PackedStringArray:
+	var headers := PackedStringArray(["Content-Type: application/json", "Accept: application/json"])
+	if NetworkManager.auth_token != "":
+		headers.append("Authorization: Bearer %s" % NetworkManager.auth_token)
+	return headers
