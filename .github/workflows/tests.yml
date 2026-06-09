@@ -55,6 +55,7 @@ jobs:
       #    -v           = verbose (afișează numele fiecărui test)
       - name: Run tests
         run: |
+          cd database
           pytest tests/ -v --tb=short --cov=. --cov-report=term-missing
 
       # 5. (Opțional) Încarcă raportul de coverage pe Codecov
