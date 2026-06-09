@@ -11,3 +11,6 @@ game/bin/*.exe
 
 # Blender
 game/assets/models/.blend1
+
+backend/instance/*.mp3
+backend/instance/*.md
