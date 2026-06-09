@@ -1,63 +1,58 @@
-from fastapi import APIRouter, HTTPException, status
-from passlib.context import CryptContext
+from fastapi import APIRouter, Depends, HTTPException, status
+import bcrypt
 
-from dependencies import create_access_token
+from dependencies import create_access_token, get_player_repo
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from database.player_repository import PlayerRepository
 from models import TokenResponse, UserLoginRequest, UserRegisterRequest
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# username -> { "email": str, "hashed_password": str }
-users_db: dict[str, dict[str, str]] = {}
-
-
 def _hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 
 def _verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def _username_taken(username: str) -> bool:
-    return username in users_db
-
-
-def _email_taken(email: str) -> bool:
-    normalized = email.lower()
-    return any(record["email"].lower() == normalized for record in users_db.values())
+    try:
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except ValueError:
+        return False
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(body: UserRegisterRequest) -> dict[str, str]:
-    if _username_taken(body.username):
+def register(body: UserRegisterRequest, player_repo: PlayerRepository = Depends(get_player_repo)) -> dict[str, str]:
+    if player_repo.player_exists(body.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    if _email_taken(body.email):
-        raise HTTPException(
+    
+    # We do not strictly check for email uniqueness with a helper yet, 
+    # but the DB enforces UNIQUE on Email. Let's try inserting.
+    hashed = _hash_password(body.password)
+    player = player_repo.create_player(player_name=body.username, email=body.email, password_hash=hashed)
+    if not player:
+         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+            detail="Registration failed. Email might already be registered.",
         )
 
-    users_db[body.username] = {
-        "email": body.email,
-        "hashed_password": _hash_password(body.password),
-    }
     return {"message": "User registered successfully"}
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(body: UserLoginRequest) -> TokenResponse:
-    user = users_db.get(body.username)
-    if user is None or not _verify_password(body.password, user["hashed_password"]):
+def login(body: UserLoginRequest, player_repo: PlayerRepository = Depends(get_player_repo)) -> TokenResponse:
+    user = player_repo.get_player_by_name(body.username)
+    if user is None or not _verify_password(body.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    player_repo.update_last_played_date(user.player_id)
     access_token = create_access_token(subject=body.username)
     return TokenResponse(access_token=access_token, token_type="bearer")
