@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://fogofwar"]
+
+[ext_resource type="Script" path="res://scripts/FogOfWar.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/VisionCircle.tscn" id="2"]
+[ext_resource type="Shader" path="res://shaders/Fog.gdshader" id="3"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fow"]
+frequency = 0.0039
+fractal_octaves = 4
+fractal_lacunarity = 2.565
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fow"]
+width = 1024
+height = 1024
+noise = SubResource("FastNoiseLite_fow")
+seamless = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_fow"]
+size = Vector2(10000, 10000)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fow"]
+render_priority = 127
+shader = ExtResource("3")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_fow")
+shader_parameter/fog_color = Color(0.91870546, 0.87822115, 0.8000969, 1)
+shader_parameter/map_size = 1024.0
+shader_parameter/fog_density = 0.51
+shader_parameter/baseline_opacity = 0.6130000291175
+
+[node name="FogOfWar" type="Node3D"]
+script = ExtResource("1")
+vision_circle_scene = ExtResource("2")
+
+[node name="FogPlane" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_fow")
+surface_material_override/0 = SubResource("ShaderMaterial_fow")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+disable_3d = true
+render_target_update_mode = 4
+
+[node name="ColorRect" type="ColorRect" parent="SubViewport"]
+offset_right = 512.0
+offset_bottom = 512.0
+color = Color(0, 0, 0, 1)

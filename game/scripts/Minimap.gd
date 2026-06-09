@@ -108,11 +108,8 @@ func _process(_delta: float) -> void:
 			_generate_terrain_texture()
 			_terrain_setup_done = true
 
-	var map = get_tree().get_first_node_in_group("map")
-	var active = map.active_ships if map and map.has_method("register_ship") else {}
-
 	var seen := {}
-	for ship in active:
+	for ship in get_tree().get_nodes_in_group("ships"):
 		if is_instance_valid(ship):
 			seen[ship] = true
 			var sprite := _ensure_ship_sprite(ship)

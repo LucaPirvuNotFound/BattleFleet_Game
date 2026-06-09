@@ -1,18 +1,17 @@
 [gd_scene format=3 uid="uid://cdspqdinofb7l"]
 
 [sub_resource type="Gradient" id="Gradient_530y2"]
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_05ijh"]
 gradient = SubResource("Gradient_530y2")
-width = 512
-height = 512
+width = 256
+height = 256
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[node name="VisionCircle" type="Sprite2D"]
+[node name="VisionCircle" type="Sprite2D" unique_id=1658870718]
 z_index = 1
-centered = true
 texture = SubResource("GradientTexture2D_05ijh")
