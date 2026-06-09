@@ -1,7 +1,7 @@
 extends Node
 class_name ApiClient
 
-const BASE_URL := "http://127.0.0.1:8001"
+const BASE_URL := "http://battlefeet.go.ro:8001"
 
 var _http: HTTPRequest
 

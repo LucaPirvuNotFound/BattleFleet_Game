@@ -11,3 +11,10 @@ game/bin/*.exe
 
 # Blender
 game/assets/models/.blend1
+
+# AI and TTS Artifacts
+*.mp3
+*.wav
+*.gguf
+models/
+

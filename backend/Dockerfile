@@ -2,6 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+RUN apt-get update && rm -rf /var/lib/apt/lists/*
+
 # Since context is now the backend folder, requirements is right here
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
