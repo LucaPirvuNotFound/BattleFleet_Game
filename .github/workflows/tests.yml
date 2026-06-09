@@ -1,0 +1,29 @@
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: barichello/godot-ci:4.6
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run GUT tests
+        run: godot --headless --addon gut/run_tests.gd --path game
+
+  junit:
+    runs-on: ubuntu-latest
+    container: barichello/godot-ci:4.6
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run GUT with JUnit export
+        run: godot --headless --addon gut/run_tests.gd --path game \
+              --gtest-dir=res://tests --junit-xml=res://test-results.xml
+
+      - uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: GUT Tests
+          path: game/test-results.xml
+          reporter: java-junit
