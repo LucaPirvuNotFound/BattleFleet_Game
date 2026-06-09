@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://xl04t428tpe"]
+
+[ext_resource type="PackedScene" uid="uid://grdw3v1vwgug" path="res://scenes/WaterPlane.tscn" id="1_5hauk"]
+
+[node name="Map" type="Node3D" unique_id=1668063004]
+
+[node name="WaterPlane" parent="." unique_id=432126146 instance=ExtResource("1_5hauk")]
+transform = Transform3D(102.20037, 0, 0, 0, 1, 0, 0, 0, 57.419563, 0, 0, 0)
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="." unique_id=1715046083]
+transform = Transform3D(10.135786, 0, 0, 0, 9.380907, 0, 0, 0, 10.741857, -7.9861145, -0.35497856, -6.877636)
+radial_segments = 24
