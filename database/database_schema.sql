@@ -6,6 +6,8 @@
 CREATE TABLE IF NOT EXISTS Players (
     PlayerID INTEGER PRIMARY KEY AUTOINCREMENT,
     PlayerName TEXT NOT NULL UNIQUE,
+    Email TEXT UNIQUE,
+    PasswordHash TEXT,
     CreatedDate TEXT DEFAULT (datetime('now')),
     LastPlayedDate TEXT,
     IsActive INTEGER DEFAULT 1,

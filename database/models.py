@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 class Player:
     player_id: int = 0
     player_name: str = ""
+    email: str = ""
+    password_hash: str = ""
     created_date: str = ""
     last_played_date: str = ""
     is_active: bool = True

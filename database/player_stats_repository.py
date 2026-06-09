@@ -21,8 +21,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Callable, Optional
 
-from database_manager import DatabaseManager
-from models import BattleRecord, PlayerStats
+from .database_manager import DatabaseManager
+from .models import BattleRecord, PlayerStats
 
 logger = logging.getLogger(__name__)
 

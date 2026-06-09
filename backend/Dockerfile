@@ -4,12 +4,13 @@ WORKDIR /app
 
 RUN apt-get update && rm -rf /var/lib/apt/lists/*
 
-# Since context is now the backend folder, requirements is right here
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all source files from the current backend folder into the container
-COPY . .
+COPY backend/ ./backend/
+COPY database/ ./database/
+
+WORKDIR /app/backend
 
 EXPOSE 8000
 

@@ -6,8 +6,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from database_manager import DatabaseManager
-from models import Player
+from .database_manager import DatabaseManager
+from .models import Player
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class PlayerRepository:
 
     # ── CREATE ─────────────────────────────────────────────────────────────────
 
-    def create_player(self, player_name: str) -> Optional[Player]:
+    def create_player(self, player_name: str, email: str = "", password_hash: str = "") -> Optional[Player]:
         """Insert a new player and create an associated PlayerStats row.
         Returns the new Player object, or None on failure."""
         if not player_name.strip():
@@ -34,9 +34,9 @@ class PlayerRepository:
 
         now = _now()
         rows_affected = self._db.execute_non_query(
-            "INSERT INTO Players (PlayerName, CreatedDate, IsActive, ELO) "
-            "VALUES (?, ?, 1, 0)",
-            (player_name, now),
+            "INSERT INTO Players (PlayerName, Email, PasswordHash, CreatedDate, IsActive, ELO) "
+            "VALUES (?, ?, ?, ?, 1, 0)",
+            (player_name, email, password_hash, now),
         )
 
         if rows_affected <= 0:
@@ -152,7 +152,7 @@ class PlayerRepository:
             """INSERT INTO PlayerStats
                (PlayerID, TotalBattles,
                 TotalWins, TotalLosses, TotalDraws, LastUpdated)
-               VALUES (?, 1, 0, 0, 0, 0, 0, ?)""",
+               VALUES (?, 0, 0, 0, 0, ?)""",
             (player_id, now),
         )
 
@@ -169,6 +169,8 @@ def _map_player(row: dict) -> Player:
     return Player(
         player_id=int(row.get("PlayerID", 0)),
         player_name=str(row.get("PlayerName", "")),
+        email=str(row.get("Email", "")),
+        password_hash=str(row.get("PasswordHash", "")),
         created_date=str(row.get("CreatedDate", "")),
         last_played_date=str(row.get("LastPlayedDate", "") or ""),
         is_active=int(row.get("IsActive", 1)) == 1,
