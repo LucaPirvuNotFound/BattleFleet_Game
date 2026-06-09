@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://doa2ubfbxa11w" path="res://scenes/Terrain.tscn" id="2_lajc7"]
 [ext_resource type="PackedScene" uid="uid://cdspqdinofb7l" path="res://scenes/VisionCircle.tscn" id="2_yyirk"]
 [ext_resource type="Shader" uid="uid://cwioc2ypejc3b" path="res://shaders/Fog.gdshader" id="4_tm3qm"]
-[ext_resource type="PackedScene" uid="uid://8i1mvv0xmuow" path="res://scenes/models/Battleship.tscn" id="6_41ykk"]
 [ext_resource type="PackedScene" path="res://scenes/Minimap.tscn" id="7_minimap"]
 [ext_resource type="Script" uid="uid://cppwrs2hvo1mb" path="res://scripts/MapCameraController.gd" id="8_camctrl"]
 
@@ -98,9 +97,6 @@ render_target_update_mode = 4
 offset_right = 512.0
 offset_bottom = 512.0
 color = Color(0, 0, 0, 1)
-
-[node name="battleship_hull" parent="." unique_id=1864170896 instance=ExtResource("6_41ykk")]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 196.1445, 0, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=124022754]
 
