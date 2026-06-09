@@ -57,8 +57,10 @@ Poll `GET /matchmaking/status` every ~1s until `status == "matched"`.
 | POST | `/matches/instant` | `{ "mode": "pve" \| "local", "fleet": FleetPayload }` | Instant room (no queue) |
 | GET | `/matches/{match_id}` | — | Full match snapshot |
 | POST | `/matches/{match_id}/coin_ack` | — | After coin animation |
-| POST | `/matches/{match_id}/placement` | PlacementRequest | Submit ship positions |
-| POST | `/matches/{match_id}/ready` | — | Confirm placement; starts combat when both ready |
+| POST | `/matches/{match_id}/battle/handoff` | — | After countdown; returns Godot battle server `{ battle_host, battle_port, battle_token, ... }` |
+| GET | `/matches/{match_id}/battle/session?token=...` | — | Godot battle server fetches match fleets (token from handoff) |
+| POST | `/matches/{match_id}/placement` | PlacementRequest | Legacy FastAPI placement (unused when using Godot server) |
+| POST | `/matches/{match_id}/ready` | — | Legacy ready confirm |
 
 ### Match phases
 
@@ -120,4 +122,4 @@ Poll `GET /matchmaking/status` every ~1s until `status == "matched"`.
 1. **Menu**: pick PvP / PvE / Local → build fleet → Continue.
 2. **PvP**: `POST /matchmaking/queue` → poll status → `GET /matches/{id}` → `Battle.tscn`.
 3. **PvE / Local**: `POST /matches/instant` → `Battle.tscn`.
-4. **Battle**: coin_ack → placement + ready → combat (stub).
+4. **Battle**: coin_ack → countdown → `battle/handoff` → connect to Godot server (port 7777) → server random placement → combat scene.

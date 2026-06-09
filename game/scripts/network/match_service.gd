@@ -53,6 +53,19 @@ func coin_ack(match_id: String) -> Dictionary:
 	)
 
 
+func request_battle_handoff(match_id: String) -> Dictionary:
+	var response := await api_client.send_request(
+		"/matches/%s/battle/handoff" % match_id,
+		HTTPClient.METHOD_POST
+	)
+	var result := response.duplicate(true)
+	if not result.has("error"):
+		result["error"] = ""
+	if result.success:
+		MatchContext.apply_handoff(result.data)
+	return result
+
+
 func submit_placement(match_id: String, placements: Array) -> Dictionary:
 	var body := {"placements": placements}
 	return _finalize(

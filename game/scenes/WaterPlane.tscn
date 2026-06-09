@@ -59,6 +59,6 @@ shader_parameter/edge_scale = 0.67
 shader_parameter/edge_color = Color(1, 1, 1, 1)
 
 [node name="WaterPlane" type="MeshInstance3D" unique_id=432126146]
-transform = Transform3D(38.197742, 0, 0, 0, 1, 0, 0, 0, 26.828587, 0, 0, 0)
+transform = Transform3D(38.197742, 0, 0, 0, 1, 0, 0, 0, 26.828587, -0.0030078888, 0.028618813, -0.021671772)
 mesh = SubResource("QuadMesh_nsty4")
 surface_material_override/0 = SubResource("ShaderMaterial_m6j1k")

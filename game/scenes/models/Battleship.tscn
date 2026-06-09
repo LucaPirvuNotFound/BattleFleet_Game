@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://8i1mvv0xmuow"]
 
-[ext_resource type="PackedScene" uid="uid://jglkpihum5yc" path="res://assets/models/WIP/battleship_hull.blend" id="1_aa428"]
+[ext_resource type="PackedScene" uid="uid://bstk6pblffd4c" path="res://assets/models/gata/Battleship/Battleship_hore.gltf" id="1_battleship"]
 
-[node name="battleship_hull" unique_id=1864170896 instance=ExtResource("1_aa428")]
+[node name="Battleship" instance=ExtResource("1_battleship")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

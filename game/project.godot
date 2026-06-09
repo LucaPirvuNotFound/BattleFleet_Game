@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 NetworkManager="*uid://dwehwnbw8dbv2"
 MatchContext="*res://scripts/match/MatchContext.gd"
+BattleNetwork="*res://scripts/battle/BattleNetwork.gd"
 
 [filesystem]
 

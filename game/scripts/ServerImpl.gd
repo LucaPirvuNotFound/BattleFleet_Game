@@ -1,4 +1,4 @@
 extends Node
 
 func _ready() -> void:
-	print("Hello from server")
+	print("[ServerImpl] Battle server mode active.")

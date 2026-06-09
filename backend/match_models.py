@@ -83,3 +83,34 @@ class MatchEvent(BaseModel):
     match_id: str
     phase: MatchPhase | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class BattlePlayerSession(BaseModel):
+    username: str
+    slot: int
+    fleet: FleetPayload
+    is_ai: bool = False
+
+
+class BattleHandoffResponse(BaseModel):
+    match_id: str
+    battle_host: str
+    battle_port: int
+    battle_token: str
+    map_seed: int
+    map_index: int
+    mode: GameMode
+    first_player_username: str | None
+    you_go_first: bool
+    local_username: str | None
+    players: list[BattlePlayerSession]
+
+
+class BattleSessionResponse(BaseModel):
+    match_id: str
+    battle_token: str
+    map_seed: int
+    map_index: int
+    mode: GameMode
+    first_player_username: str | None
+    players: list[BattlePlayerSession]

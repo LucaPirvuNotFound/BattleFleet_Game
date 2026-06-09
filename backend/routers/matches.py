@@ -3,7 +3,14 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from dependencies import get_current_user, get_current_user_optional
-from match_models import GameMode, InstantMatchRequest, MatchView, PlacementRequest
+from match_models import (
+    BattleHandoffResponse,
+    BattleSessionResponse,
+    GameMode,
+    InstantMatchRequest,
+    MatchView,
+    PlacementRequest,
+)
 from services import match_store
 
 router = APIRouter(prefix="/matches", tags=["matches"])
@@ -41,6 +48,20 @@ def coin_ack(
 ) -> MatchView:
     username = _resolve_coin_ack_username(current_user, match_id)
     return match_store.acknowledge_coin(match_id, username)
+
+
+@router.post("/{match_id}/battle/handoff", response_model=BattleHandoffResponse)
+def battle_handoff(
+    match_id: str,
+    current_user: dict[str, Any] | None = Depends(get_current_user_optional),
+) -> BattleHandoffResponse:
+    username = _resolve_coin_ack_username(current_user, match_id)
+    return match_store.create_battle_handoff(match_id, username)
+
+
+@router.get("/{match_id}/battle/session", response_model=BattleSessionResponse)
+def battle_session(match_id: str, token: str) -> BattleSessionResponse:
+    return match_store.get_battle_session(match_id, token)
 
 
 @router.post("/{match_id}/placement", response_model=MatchView)

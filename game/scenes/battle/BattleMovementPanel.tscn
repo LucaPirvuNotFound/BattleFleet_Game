@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://battle_movement_panel"]
+
+[ext_resource type="Script" path="res://scenes/movement_test/movement_controller_3d.gd" id="1_move_ctrl"]
+
+[node name="BattleMovementPanel" type="Control"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -300.0
+offset_right = 170.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_move_ctrl")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.1, 0.16, 0.92)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Select movement"
+
+[node name="AngleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Angle: 0°"
+
+[node name="AngleSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+
+[node name="DistanceLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Distance: 0"
+
+[node name="DistanceSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+max_value = 90.0
+
+[node name="MovePanel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MovePanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/MovePanel/VBoxContainer"]
+layout_mode = 2
+text = "Movement"
+
+[node name="ConfirmMoveButton" type="Button" parent="VBoxContainer/MovePanel/VBoxContainer"]
+layout_mode = 2
+text = "Move!"
+
+[node name="FirePanel" type="PanelContainer" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/FirePanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/FirePanel/VBoxContainer"]
+layout_mode = 2
+text = "Cannons"
+
+[node name="ConfirmFireButton" type="Button" parent="VBoxContainer/FirePanel/VBoxContainer"]
+layout_mode = 2
+text = "Fire!"
+
+[node name="EndTurnButton" type="Button" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "End Turn"
+
+[node name="CancelButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cancel"
