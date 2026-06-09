@@ -17,7 +17,7 @@
 import time
 import math
 import pytest
-from models import BattleRecord
+from database.models import BattleRecord
 from database_manager import DatabaseManager
 from database.player_repository import PlayerRepository
 from database.player_stats_repository import PlayerStatsRepository

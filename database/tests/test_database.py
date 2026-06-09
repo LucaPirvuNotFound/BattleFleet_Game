@@ -13,8 +13,8 @@
 import os
 import time
 import math
-from models import BattleRecord, Player, PlayerStats
-from database_manager import DatabaseManager
+from database.models import BattleRecord, Player, PlayerStats
+from database.database_manager import DatabaseManager
 from database.player_repository import PlayerRepository
 from database.player_stats_repository import PlayerStatsRepository, calculate_fleet_level
 
