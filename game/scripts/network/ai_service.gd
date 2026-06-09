@@ -3,6 +3,14 @@ class_name AiService
 
 var api_client: ApiClient
 
+## Server should respond within ~12s (Ollama) or fallback; don't wait 90s on a hung Pi.
+const ADMIRAL_TURN_TIMEOUT_SEC := 20.0
+const DEBUG_JSON_MAX_CHARS := 12000
+
+## Server should respond within ~12s (Ollama) or fallback; don't wait 90s on a hung Pi.
+const ADMIRAL_TURN_TIMEOUT_SEC := 20.0
+const DEBUG_JSON_MAX_CHARS := 12000
+
 var _admiral_http: HTTPRequest
 var _narrator_http: HTTPRequest
 var _audio_player: AudioStreamPlayer

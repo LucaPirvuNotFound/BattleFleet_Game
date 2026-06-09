@@ -3,16 +3,16 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6yqmoagpsanv"
-path.etc2="res://.godot/imported/Corvette_Normal_map.png-ad4e7b9c47a0d8f52a6b4c2328ed47b7.etc2.ctex"
+path.s3tc="res://.godot/imported/Corvette_Normal_map.png-ad4e7b9c47a0d8f52a6b4c2328ed47b7.s3tc.ctex"
 metadata={
-"imported_formats": ["etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/models/gata/Corvette/Corvette_Normal_map.png"
-dest_files=["res://.godot/imported/Corvette_Normal_map.png-ad4e7b9c47a0d8f52a6b4c2328ed47b7.etc2.ctex"]
+dest_files=["res://.godot/imported/Corvette_Normal_map.png-ad4e7b9c47a0d8f52a6b4c2328ed47b7.s3tc.ctex"]
 
 [params]
 

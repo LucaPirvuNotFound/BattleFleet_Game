@@ -51,15 +51,17 @@ func highlight_ship(ship_index: int) -> void:
 
 func update_ship_health(ship_index: int, hp: int, max_hp: int) -> void:
 	for child in _ship_list.get_children():
-		if int(child.get_meta("ship_index", -1)) == ship_index:
-			var bar: ProgressBar = child.get_node_or_null("HealthBar")
-			if bar:
-				bar.max_value = float(max_hp)
-				bar.value = float(hp)
-			var hp_label: Label = child.get_node_or_null("HpLabel")
-			if hp_label:
-				hp_label.text = "%d/%d" % [hp, max_hp]
-			return
+		if int(child.get_meta("ship_index", -1)) != ship_index:
+			continue
+		var bar: ProgressBar = child.find_child("HealthBar", true, false) as ProgressBar
+		if bar:
+			bar.max_value = float(max_hp)
+			bar.value = float(hp)
+		var hp_label: Label = child.find_child("HpLabel", true, false) as Label
+		if hp_label:
+			hp_label.text = "%d/%d" % [hp, max_hp]
+		child.modulate = Color(0.45, 0.5, 0.55, 0.65) if hp <= 0 else Color.WHITE
+		return
 
 
 func _build_ship_row(ship: Dictionary) -> Control:

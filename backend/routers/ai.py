@@ -4,8 +4,13 @@ import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
+import json
+import logging
+import os
 
 from services.ai_service import get_admiral_decision, get_narrator_commentary
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
@@ -46,9 +51,17 @@ async def admiral_turn(payload: GameStatePayload):
     in the form: { match_id, round, phase, actions: [ { ship_index, orders: [...] } ] }
     """
     try:
+        logger.info(
+            "admiral_turn request match=%s round=%s ai_ships=%d",
+            payload.game_state.get("match_id"),
+            payload.game_state.get("round"),
+            len(payload.game_state.get("ai_fleet", [])),
+        )
         decision = await get_admiral_decision(payload.game_state)
+        logger.info("admiral_turn response: %s", json.dumps(decision)[:2000])
         return decision
     except Exception as e:
+        logger.exception("admiral_turn failed")
         raise HTTPException(status_code=500, detail=str(e))
 
 

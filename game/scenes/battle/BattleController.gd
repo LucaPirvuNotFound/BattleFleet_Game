@@ -51,6 +51,7 @@ var _fire_ship_index: int = -1
 var _fire_weapon_name: String = ""
 var _round_number: int = 1
 var _is_ai_turn: bool = false
+var _ai_waiting_for_server: bool = false
 var _left_click_start: Vector2 = Vector2.ZERO
 
 
@@ -310,6 +311,10 @@ func _fleet_center(ships: Array) -> Vector3:
 	return sum / float(ships.size())
 
 
+func _is_ship_alive(ship: Dictionary) -> bool:
+	return not bool(ship.get("destroyed", false)) and int(ship.get("hp", 0)) > 0
+
+
 func _get_player_ship(ship_index: int) -> Dictionary:
 	for ship in _player_ships:
 		if int(ship.get("ship_index", -1)) == ship_index:
@@ -317,9 +322,26 @@ func _get_player_ship(ship_index: int) -> Dictionary:
 	return {}
 
 
+func _get_ship_world_position(ship: Dictionary) -> Vector3:
+	var marker: Node3D = ship.get("marker")
+	if marker != null and is_instance_valid(marker):
+		return marker.global_position
+	return ship.get("world_pos", Vector3.ZERO)
+
+
+func _sync_all_ship_positions() -> void:
+	_sync_movers_to_markers()
+	for ship in _enemy_ships:
+		if not ship is Dictionary or not _is_ship_alive(ship):
+			continue
+		var marker: Node3D = ship.get("marker")
+		if marker != null and is_instance_valid(marker):
+			ship["world_pos"] = marker.global_position
+
+
 func _select_ship(ship_index: int, glide_camera: bool = false) -> void:
 	var ship := _get_player_ship(ship_index)
-	if ship.is_empty():
+	if ship.is_empty() or not _is_ship_alive(ship):
 		return
 
 	_selected_ship_index = ship_index
@@ -376,7 +398,9 @@ func _try_pick_player_ship(local_pos: Vector2) -> void:
 	var best_dist := SHIP_PICK_RADIUS
 
 	for ship in _player_ships:
-		var pos: Vector3 = ship.get("world_pos", Vector3.ZERO)
+		if not _is_ship_alive(ship):
+			continue
+		var pos := _get_ship_world_position(ship)
 		var dist := Vector2(hit_vec.x - pos.x, hit_vec.z - pos.z).length()
 		if dist < best_dist:
 			best_dist = dist
@@ -432,7 +456,10 @@ func _begin_player_round() -> void:
 
 func _update_round_label() -> void:
 	if _is_ai_turn:
-		_round_label.text = "Round %d — AI turn" % _round_number
+		if _ai_waiting_for_server:
+			_round_label.text = "Round %d — Enemy admiral planning..." % _round_number
+		else:
+			_round_label.text = "Round %d — AI acting" % _round_number
 	else:
 		_round_label.text = "Round %d — Your turn" % _round_number
 
@@ -444,8 +471,12 @@ func _set_player_input_enabled(enabled: bool) -> void:
 
 func _run_ai_turn_stub() -> void:
 	_is_ai_turn = true
+	_ai_waiting_for_server = true
 	_update_round_label()
 	BattleTurnManager.reset_fleet_for_round(_enemy_ships)
+
+	# Yield so the round label repaints before serializing the battle state.
+	await get_tree().process_frame
 
 	var ai_request := BattleTurnManager.build_ai_turn_request({
 		"match_id": MatchContext.match_id,
@@ -465,64 +496,118 @@ func _run_ai_turn_stub() -> void:
 	# Fire narrator immediately (no await — plays audio whenever the server responds).
 	NetworkManager.ai_service.request_narrator_turn(ai_request)
 
+	var enemy_indices: PackedStringArray = []
+	for ship in _enemy_ships:
+		if ship is Dictionary:
+			enemy_indices.append(str(ship.get("ship_index", "?")))
+	print(
+		"[Battle] AI turn round=%d enemy_ships=%d indices=[%s]"
+		% [_round_number, _enemy_ships.size(), ", ".join(enemy_indices)]
+	)
 	var response := await NetworkManager.ai_service.request_admiral_turn(ai_request)
+	_ai_waiting_for_server = false
+	_update_round_label()
+
+	var ai_data: Dictionary = {}
 	if response.success:
-		await _execute_ai_actions(response.data)
+		ai_data = response.data
+		if ai_data.has("error"):
+			push_warning("[Battle] AI returned error: %s" % str(ai_data.get("error", "")))
+			ai_data = {}
 	else:
 		push_warning("[Battle] AI turn request failed: %s" % str(response.get("error", "unknown")))
-		await get_tree().create_timer(1.2).timeout
+
+	if ai_data.is_empty() or ai_data.get("actions", []).is_empty():
+		var fallback := BattleTurnManager.build_local_fallback_ai_response(ai_request)
+		print("[Battle] Using local AI fallback — %d action(s)" % fallback.get("actions", []).size())
+		print("[Battle] Local fallback: %s" % JSON.stringify(fallback))
+		ai_data = fallback
+
+	if not ai_data.get("actions", []).is_empty():
+		await _execute_ai_actions(ai_data)
+	else:
+		push_warning("[Battle] No AI actions available (server and local fallback both empty).")
 
 	_is_ai_turn = false
 
 
 func _get_enemy_ship(ship_index: int) -> Dictionary:
 	for ship in _enemy_ships:
-		if int(ship.get("ship_index", -1)) == ship_index:
+		if int(ship.get("ship_index", -1)) == ship_index and _is_ship_alive(ship):
 			return ship
 	return {}
 
 
 func _execute_ai_actions(ai_response: Dictionary) -> void:
+	print("[Battle] Executing AI actions: %s" % JSON.stringify(ai_response))
 	var actions: Array = ai_response.get("actions", [])
 	if actions.is_empty():
+		push_warning("[Battle] AI response has no actions — ships will not move.")
 		await get_tree().create_timer(0.8).timeout
 		return
 	for action in actions:
 		if not action is Dictionary:
+			print("[Battle] Skipping non-dict action: %s" % str(action))
 			continue
 		var ship_index: int = int(action.get("ship_index", -1))
 		if ship_index < 0:
+			print("[Battle] Skipping action with invalid ship_index: %s" % str(action))
 			continue
 		var enemy_ship := _get_enemy_ship(ship_index)
 		if enemy_ship.is_empty():
+			push_warning(
+				"[Battle] No alive enemy ship for ship_index=%d (have indices on field)" % ship_index
+			)
 			continue
 		var orders: Array = action.get("orders", [])
+		print("[Battle] ship_index=%d orders=%s" % [ship_index, JSON.stringify(orders)])
 		for order in orders:
 			if not order is Dictionary:
 				continue
-			var order_type: String = str(order.get("type", ""))
+			var order_type: String = str(order.get("type", "")).to_lower()
 			if order_type == "move":
-				_execute_ai_move(enemy_ship, float(order.get("angle", 0.0)), float(order.get("distance", 0.0)))
+				var angle := float(order.get("angle", 0.0))
+				var distance := float(order.get("distance", 0.0))
+				print("[Battle] AI move ship=%d angle=%.1f distance=%.1f" % [ship_index, angle, distance])
+				_execute_ai_move(enemy_ship, angle, distance)
 				await get_tree().create_timer(0.8).timeout
 			elif order_type == "fire":
-				_execute_ai_fire(enemy_ship, str(order.get("weapon", "")), float(order.get("angle", 0.0)), float(order.get("distance", 0.0)))
+				var weapon := str(order.get("weapon", ""))
+				var angle := float(order.get("angle", 0.0))
+				var distance := float(order.get("distance", 0.0))
+				print("[Battle] AI fire ship=%d weapon=%s angle=%.1f distance=%.1f" % [
+					ship_index, weapon, angle, distance
+				])
+				_execute_ai_fire(enemy_ship, weapon, angle, distance)
 				await get_tree().create_timer(0.5).timeout
+			else:
+				print("[Battle] Unknown AI order type '%s': %s" % [order_type, JSON.stringify(order)])
 
 
 func _execute_ai_move(ship: Dictionary, angle_deg: float, distance: float) -> void:
-	if distance <= 0.0:
-		return
+	var move_distance := distance
+	if move_distance <= 0.0:
+		move_distance = BattleTurnManager.MAX_MOVE_DISTANCE * 0.5
+		print("[Battle] AI move distance was <= 0, using fallback %.1f" % move_distance)
+
 	var marker: Node3D = ship.get("marker")
-	if marker == null:
+	if marker == null or not is_instance_valid(marker):
+		push_warning("[Battle] AI move failed — ship has no marker (index=%d)" % int(ship.get("ship_index", -1)))
 		return
+
+	var old_pos: Vector3 = marker.global_position
 	var forward := -marker.transform.basis.z
 	var right := marker.transform.basis.x
 	var angle_rad := deg_to_rad(angle_deg)
 	var move_dir := (forward * cos(angle_rad) + right * sin(angle_rad)).normalized()
-	var new_pos: Vector3 = ship.get("world_pos", Vector3.ZERO) + move_dir * distance
+	var new_pos: Vector3 = old_pos + move_dir * move_distance
 	new_pos.y = WATER_SURFACE_Y
 	marker.global_position = new_pos
 	ship["world_pos"] = new_pos
+	print(
+		"[Battle] AI moved ship %d from (%.1f, %.1f) to (%.1f, %.1f)"
+		% [int(ship.get("ship_index", -1)), old_pos.x, old_pos.z, new_pos.x, new_pos.z]
+	)
 
 
 func _execute_ai_fire(ship: Dictionary, weapon_name: String, angle: float, distance: float) -> void:
@@ -553,7 +638,7 @@ func _on_move_requested(ship_index: int) -> void:
 
 func _begin_movement_for_ship(ship_index: int) -> void:
 	var ship := _get_player_ship(ship_index)
-	if ship.is_empty():
+	if ship.is_empty() or not _is_ship_alive(ship):
 		return
 
 	var mover := _get_or_create_mover(ship_index, ship)
@@ -659,6 +744,8 @@ func _apply_ship_damage(team: String, ship_index: int, damage: int, kind: String
 	for ship in ships:
 		if int(ship.get("ship_index", -1)) != ship_index:
 			continue
+		if not _is_ship_alive(ship):
+			return
 		ship["hp"] = maxi(0, int(ship.get("hp", 0)) - damage)
 		if team == "player":
 			_fleet_panel.update_ship_health(ship_index, int(ship["hp"]), int(ship.get("max_hp", 100)))
@@ -666,7 +753,34 @@ func _apply_ship_damage(team: String, ship_index: int, damage: int, kind: String
 		print("[Battle] %s ship #%d took %d %s damage (%d HP left)" % [
 			team, ship_index, damage, kind, int(ship["hp"])
 		])
+		if int(ship["hp"]) <= 0:
+			_destroy_ship(team, ship_index, ship)
 		return
+
+
+func _destroy_ship(team: String, ship_index: int, ship: Dictionary) -> void:
+	ship["destroyed"] = true
+	ship["hp"] = 0
+
+	var marker: Node3D = ship.get("marker")
+	if marker != null and is_instance_valid(marker):
+		marker.queue_free()
+	ship["marker"] = null
+
+	if team == "player":
+		var mover := _ship_movers.get(ship_index) as Node
+		if mover != null and is_instance_valid(mover):
+			mover.queue_free()
+		_ship_movers.erase(ship_index)
+		_fleet_panel.update_ship_health(ship_index, 0, int(ship.get("max_hp", 100)))
+		if _selected_ship_index == ship_index:
+			_deselect_ship()
+		if _movement_ship_index == ship_index:
+			_on_movement_cancelled()
+		if _fire_ship_index == ship_index:
+			_on_fire_cancelled()
+
+	print("[Battle] %s ship #%d destroyed" % [team, ship_index])
 
 
 func _sync_movers_to_markers() -> void:
@@ -685,7 +799,7 @@ func _on_fire_requested(ship_index: int, weapon_name: String) -> void:
 	if _is_ai_turn:
 		return
 	var ship := _get_player_ship(ship_index)
-	if ship.is_empty() or not BattleTurnManager.can_fire_weapon(ship, weapon_name):
+	if ship.is_empty() or not _is_ship_alive(ship) or not BattleTurnManager.can_fire_weapon(ship, weapon_name):
 		return
 
 	_on_movement_cancelled()
@@ -746,20 +860,23 @@ func _on_weapon_impact(
 	firer_ship_index: int,
 	firer_team: String
 ) -> void:
+	_sync_all_ship_positions()
+
 	var stats := BattleTurnManager.get_weapon_stats(weapon_name)
 	var damage: int = int(stats.get("damage", 20))
 	var aoe_radius: float = float(stats.get("aoe_radius", 16.0))
+	var impact_xz := Vector2(impact_pos.x, impact_pos.z)
 
 	for team: String in ["player", "enemy"]:
 		var ships: Array = _player_ships if team == "player" else _enemy_ships
 		for ship in ships:
-			if not ship is Dictionary:
+			if not ship is Dictionary or not _is_ship_alive(ship):
 				continue
 			var target_index := int(ship.get("ship_index", -1))
 			if team == firer_team and target_index == firer_ship_index:
 				continue
-			var pos: Vector3 = ship.get("world_pos", Vector3.ZERO)
-			var dist := Vector2(impact_pos.x - pos.x, impact_pos.z - pos.z).length()
+			var pos := _get_ship_world_position(ship)
+			var dist := impact_xz.distance_to(Vector2(pos.x, pos.z))
 			if dist <= aoe_radius:
 				_apply_ship_damage(team, target_index, damage, weapon_name)
 
@@ -782,10 +899,10 @@ func _on_camera_view_changed() -> void:
 
 
 func _on_viewport_gui_input(event: InputEvent) -> void:
-	if _loading_overlay.visible or not MatchContext.is_active or _is_ai_turn:
+	if _loading_overlay.visible or not MatchContext.is_active:
 		return
 
-	if event is InputEventMouseButton:
+	if not _is_ai_turn and event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			if mb.pressed:

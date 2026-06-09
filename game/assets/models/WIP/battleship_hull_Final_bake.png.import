@@ -3,9 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bxwu4ms635kgg"
-path.etc2="res://.godot/imported/battleship_hull_Final_bake.png-38df346448046799fa3b6830b0679984.etc2.ctex"
+path.s3tc="res://.godot/imported/battleship_hull_Final_bake.png-38df346448046799fa3b6830b0679984.s3tc.ctex"
 metadata={
-"imported_formats": ["etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/WIP/battleship_hull_Final_bake.png"
-dest_files=["res://.godot/imported/battleship_hull_Final_bake.png-38df346448046799fa3b6830b0679984.etc2.ctex"]
+dest_files=["res://.godot/imported/battleship_hull_Final_bake.png-38df346448046799fa3b6830b0679984.s3tc.ctex"]
 
 [params]
 

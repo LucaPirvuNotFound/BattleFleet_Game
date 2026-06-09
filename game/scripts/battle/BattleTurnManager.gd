@@ -60,8 +60,11 @@ static func init_ship_round_state(ship: Dictionary) -> void:
 
 static func reset_fleet_for_round(ships: Array) -> void:
 	for ship in ships:
-		if ship is Dictionary:
-			init_ship_round_state(ship)
+		if not ship is Dictionary:
+			continue
+		if bool(ship.get("destroyed", false)) or int(ship.get("hp", 0)) <= 0:
+			continue
+		init_ship_round_state(ship)
 
 
 static func can_move(ship: Dictionary) -> bool:
@@ -238,6 +241,74 @@ static func serialize_ship(ship: Dictionary) -> Dictionary:
 		"can_fire": can_fire_any(ship),
 		"weapons": weapon_entries,
 		"actions_this_round": ship.get("round_actions", []).duplicate(),
+	}
+
+
+static func build_local_fallback_ai_response(game_state: Dictionary) -> Dictionary:
+	var rules: Dictionary = game_state.get("rules", {})
+	var max_move := float(rules.get("max_move_distance", MAX_MOVE_DISTANCE))
+	var ai_fleet: Array = game_state.get("ai_fleet", [])
+	var visible_human: Array = game_state.get("visible_human_ships", [])
+	var actions: Array = []
+
+	for ship in ai_fleet:
+		if not ship is Dictionary:
+			continue
+		var ship_index := int(ship.get("ship_index", -1))
+		if ship_index < 0:
+			continue
+
+		var pos: Dictionary = ship.get("position", {})
+		var sx := float(pos.get("x", 0.0))
+		var sz := float(pos.get("z", 0.0))
+
+		var target: Dictionary = {}
+		var best_dist := INF
+		for human in visible_human:
+			if not human is Dictionary or human.get("visible_to_ai") == false:
+				continue
+			var hpos: Dictionary = human.get("position", {})
+			var dist := Vector2(
+				float(hpos.get("x", 0.0)) - sx,
+				float(hpos.get("z", 0.0)) - sz
+			).length()
+			if dist < best_dist:
+				best_dist = dist
+				target = human
+
+		var orders: Array = []
+		if not target.is_empty():
+			var tpos: Dictionary = target.get("position", {})
+			var dx := float(tpos.get("x", 0.0)) - sx
+			var dz := float(tpos.get("z", 0.0)) - sz
+			var bearing := rad_to_deg(atan2(dx, -dz))
+			var move_dist := minf(max_move, maxf(0.0, best_dist - 40.0))
+			if move_dist > 5.0:
+				orders.append({"type": "move", "angle": bearing, "distance": snappedf(move_dist, 0.1)})
+
+			var weapon_name := ""
+			for weapon in ship.get("weapons", []):
+				if weapon is Dictionary and weapon.get("available", true):
+					weapon_name = str(weapon.get("name", ""))
+					break
+			if not weapon_name.is_empty():
+				var fire_dist := clampf(best_dist, 20.0, 200.0)
+				orders.append({
+					"type": "fire",
+					"weapon": weapon_name,
+					"angle": bearing,
+					"distance": snappedf(fire_dist, 0.1),
+				})
+
+		if not orders.is_empty():
+			actions.append({"ship_index": ship_index, "orders": orders})
+
+	return {
+		"match_id": str(game_state.get("match_id", "")),
+		"round": int(game_state.get("round", 1)),
+		"phase": "ai_turn_end",
+		"source": "local_fallback",
+		"actions": actions,
 	}
 
 
