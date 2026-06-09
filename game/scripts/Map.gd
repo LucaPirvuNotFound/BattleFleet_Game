@@ -32,15 +32,12 @@ func _ready() -> void:
         fog_material.set_shader_parameter("map_size", map_size)
 
 func _follow_camera() -> void:
-    var cam := get_viewport().get_camera_3d()
-    if not cam:
-        return
-    if water_plane:
-        water_plane.position.x = cam.global_position.x
-        water_plane.position.z = cam.global_position.z
-    if fog_plane:
-        fog_plane.position.x = cam.global_position.x
-        fog_plane.position.z = cam.global_position.z
+	var cam := get_viewport().get_camera_3d()
+	if not cam:
+		return
+	if water_plane:
+		water_plane.position.x = cam.global_position.x
+		water_plane.position.z = cam.global_position.z
 
 
 func _process(_delta: float) -> void:

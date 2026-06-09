@@ -17,17 +17,18 @@ void vertex() {
 }
 
 void fragment() {
-    vec2 fog_uv = (world_xz / map_size) + 0.5;
-    float mask_val = texture(fog_mask, fog_uv).r;
-    vec4 noise_val = texture(noise_texture, fog_uv);
+    vec2 world_uv = (world_xz / map_size) + 0.5;
+    vec2 mask_uv = clamp(world_uv, 0.0, 1.0);
+    float mask_val = texture(fog_mask, mask_uv).r;
+    float noise_val = texture(noise_texture, world_uv).r;
 
-    float base_thickness = clamp(noise_val.r * fog_density, 0.0, 1.0);
+    float base_thickness = clamp(noise_val * fog_density, 0.0, 1.0);
     float noise_alpha = max(baseline_opacity, base_thickness);
 
     float visibility_alpha = 1.0 - mask_val;
 
     float final_alpha = visibility_alpha * noise_alpha * fog_color.a;
 
-    ALBEDO = fog_color.rgb * noise_val.rgb;
+    ALBEDO = fog_color.rgb * noise_val;
     ALPHA = final_alpha;
 }

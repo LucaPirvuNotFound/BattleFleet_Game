@@ -6,9 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://cdspqdinofb7l" path="res://scenes/VisionCircle.tscn" id="2_yyirk"]
 [ext_resource type="Shader" uid="uid://cwioc2ypejc3b" path="res://shaders/Fog.gdshader" id="4_tm3qm"]
 [ext_resource type="PackedScene" path="res://scenes/Minimap.tscn" id="7_minimap"]
-[ext_resource type="PackedScene" uid="uid://8i1mvv0xmuow" path="res://scenes/models/Battleship.tscn" id="8_7ctrk"]
+[ext_resource type="PackedScene" uid="uid://dcyo04ls2npj5" path="res://scenes/models/Destroyer.tscn" id="8_7ctrk"]
 [ext_resource type="Script" uid="uid://cppwrs2hvo1mb" path="res://scripts/MapCameraController.gd" id="8_camctrl"]
-[ext_resource type="PackedScene" uid="uid://5gceoldkf58f" path="res://scenes/models/Corvette.tscn" id="9_ii6k2"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ii6k2"]
 _surfaces = [{
@@ -24,7 +23,7 @@ _surfaces = [{
 }]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_lajc7"]
-size = Vector2(4000, 4000)
+size = Vector2(10000, 10000)
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_46d0c"]
 viewport_path = NodePath("SubViewport")
@@ -91,7 +90,7 @@ mesh = SubResource("ArrayMesh_ii6k2")
 size = 1024.0
 
 [node name="FogPlane" type="MeshInstance3D" parent="." unique_id=1251891885]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_lajc7")
 surface_material_override/0 = SubResource("ShaderMaterial_yyirk")
@@ -135,8 +134,5 @@ current = true
 size = 520.0
 script = ExtResource("8_camctrl")
 
-[node name="battleship_hull" parent="." unique_id=400756455 instance=ExtResource("8_7ctrk")]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -173.58826, 0, -36.367188)
-
-[node name="Corvette2" parent="." unique_id=2026489784 instance=ExtResource("9_ii6k2")]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -275.04733, 0, 0)
+[node name="Destroyer" parent="." unique_id=2001487392 instance=ExtResource("8_7ctrk")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 181.15329, 0, 120.35722)
