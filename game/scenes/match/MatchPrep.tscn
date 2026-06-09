@@ -1,6 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://bf_match_prep"]
+[gd_scene load_steps=10 format=3 uid="uid://bf_match_prep"]
 
 [ext_resource type="Script" path="res://scripts/match/MatchPrepController.gd" id="1_prep"]
+[ext_resource type="PackedScene" path="res://scenes/Minimap.tscn" id="1_minimap"]
+[ext_resource type="Script" path="res://scripts/MapCameraController.gd" id="2_camctrl"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_prep"]
 sky_top_color = Color(0.28, 0.45, 0.7, 1)
@@ -73,6 +75,8 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 400
 projection = 1
 size = 520.0
 current = true
+script = ExtResource("2_camctrl")
+map_size = 1024.0
 
 [node name="CoinCamera" type="Camera3D" parent="World"]
 unique_name_in_owner = true
@@ -255,6 +259,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Minimap" parent="UI" instance=ExtResource("1_minimap")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -212.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 212.0
+grow_horizontal = 0
 
 [node name="Panel" type="PanelContainer" parent="UI/MatchmakingOverlay"]
 layout_mode = 1

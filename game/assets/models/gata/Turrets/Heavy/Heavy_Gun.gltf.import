@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cc5f66djw6jqq"
-path="res://.godot/imported/Battleship_hore.gltf-2d5f18ae2245fa721e682c3e0b5604b3.scn"
+uid="uid://v0iglu02cxmg"
+path="res://.godot/imported/Heavy_Gun.gltf-547b9eadcece7667800ed6dce911312f.scn"
 
 [deps]
 
-source_file="res://assets/models/gata/Battleship/Battleship_hore.gltf"
-dest_files=["res://.godot/imported/Battleship_hore.gltf-2d5f18ae2245fa721e682c3e0b5604b3.scn"]
+source_file="res://assets/models/gata/Turrets/Heavy/Heavy_Gun.gltf"
+dest_files=["res://.godot/imported/Heavy_Gun.gltf-547b9eadcece7667800ed6dce911312f.scn"]
 
 [params]
 

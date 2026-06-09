@@ -6,10 +6,10 @@ const TERRAIN_SCENE := preload("res://scenes/Terrain.tscn")
 
 ## Same layout as res://scenes/Map.tscn (water + procedural terrain).
 const WATER_TRANSFORM := Transform3D(
-	Vector3(2172.9902, 0.0, 0.0),
+	Vector3(5000.0, 0.0, 0.0),
 	Vector3(0.0, 1.0, 0.0),
-	Vector3(0.0, 0.0, 3940.6936),
-	Vector3.ZERO
+	Vector3(0.0, 0.0, 5000.0),
+	Vector3(0.0, -2.0, 0.0)
 )
 const TERRAIN_TRANSFORM := Transform3D(
 	Vector3(0.9988981, 0.0, 0.0),

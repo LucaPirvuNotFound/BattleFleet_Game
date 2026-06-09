@@ -32,6 +32,8 @@ const COIN_LAND_RED_X := PI
 @onready var _matchmaking_overlay: Control = %MatchmakingOverlay
 @onready var _matchmaking_label: Label = %MatchmakingLabel
 
+@onready var _minimap: Control = %Minimap
+
 var _map_root: Node3D
 var _terrain: MeshInstance3D
 var _water: Node3D
@@ -204,6 +206,7 @@ func _build_map_phase() -> void:
 	_terrain = built.terrain
 	_water = built.water
 	_map_anchor.add_child(_map_root)
+	_map_root.add_to_group("map")
 
 	_loading_bar.value = 0.9
 	await get_tree().process_frame
@@ -254,6 +257,8 @@ func _fit_camera_to_map() -> void:
 	_map_camera.rotation_degrees = Vector3(-90.0, 0.0, 0.0)
 	_map_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	_map_camera.size = ortho_size
+	if _terrain and _map_camera.has_method("setup"):
+		_map_camera.setup(_terrain.size)
 	_map_camera.current = true
 	_coin_camera.current = false
 

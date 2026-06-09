@@ -21,6 +21,10 @@ NetworkManager="*uid://dwehwnbw8dbv2"
 MatchContext="*res://scripts/match/MatchContext.gd"
 BattleNetwork="*res://scripts/battle/BattleNetwork.gd"
 
+[dotnet]
+
+project/assembly_name="BattleFeet"
+
 [filesystem]
 
 import/blender/enabled=false

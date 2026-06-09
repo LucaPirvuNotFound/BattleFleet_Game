@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cc5f66djw6jqq"
-path="res://.godot/imported/Battleship_hore.gltf-2d5f18ae2245fa721e682c3e0b5604b3.scn"
+uid="uid://catfd3aj7asmi"
+path="res://.godot/imported/Torpedo_Turret.gltf-802f0c119cf9651d32b7af1b5d71de6f.scn"
 
 [deps]
 
-source_file="res://assets/models/gata/Battleship/Battleship_hore.gltf"
-dest_files=["res://.godot/imported/Battleship_hore.gltf-2d5f18ae2245fa721e682c3e0b5604b3.scn"]
+source_file="res://assets/models/gata/Turrets/Torpedo/Torpedo_Turret.gltf"
+dest_files=["res://.godot/imported/Torpedo_Turret.gltf-802f0c119cf9651d32b7af1b5d71de6f.scn"]
 
 [params]
 
