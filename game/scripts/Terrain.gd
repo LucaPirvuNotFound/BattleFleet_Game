@@ -1,6 +1,10 @@
 @tool
 extends MeshInstance3D
 
+
+func _ready() -> void:
+	add_to_group("terrain")
+
 @export_range(64, 2048, 16) var size = 256.0:
 	set(new_size):
 		size = new_size
