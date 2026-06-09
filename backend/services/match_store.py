@@ -158,7 +158,7 @@ def create_instant_match(
         local_opponent = _new_player(guest_name, 1, guest_fleet)
         return _create_match(GameMode.LOCAL, [human, local_opponent])
 
-    ai = _new_player(AI_USERNAME, 1, FleetPayload.model_validate(AI_FLEET))
+    ai = _new_player(AI_USERNAME, 1, fleet)
     match = _create_match(GameMode.PVE, [human, ai])
     # AI auto-acknowledges coin flip for smoother solo flow
     ai_player = match["players"][1]

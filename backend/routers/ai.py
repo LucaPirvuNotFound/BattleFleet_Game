@@ -1,7 +1,9 @@
+import base64
+import os
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
-import os
 
 from services.ai_service import get_admiral_decision, get_narrator_commentary
 
@@ -13,6 +15,28 @@ class GameStatePayload(BaseModel):
 class NarratorPayload(BaseModel):
     game_state: Dict[str, Any]
     instruction_text: Optional[str] = "You are Snoop Dogg acting as a naval deck officer. Warn the captain about the current situation using your signature style, slang, and laid-back attitude."
+
+@router.post("/narrator_turn")
+async def narrator_turn(payload: GameStatePayload):
+    """
+    Game narrator: generates a one-sentence Snoop Dogg commentary line about
+    the current battle state, converts it to MP3 via gTTS, and returns the
+    audio as base64 so the client can decode and play it without a second request.
+    """
+    output_audio_path = "instance/narrator_output.mp3"
+    os.makedirs("instance", exist_ok=True)
+    try:
+        commentary = await get_narrator_commentary(
+            payload.game_state,
+            "instance/_game_narrator_instruction.md",
+            output_audio_path,
+        )
+        with open(output_audio_path, "rb") as f:
+            audio_b64 = base64.b64encode(f.read()).decode("utf-8")
+        return {"commentary": commentary, "audio_b64": audio_b64}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/admiral_turn")
 async def admiral_turn(payload: GameStatePayload):

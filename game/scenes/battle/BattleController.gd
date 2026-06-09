@@ -462,6 +462,9 @@ func _run_ai_turn_stub() -> void:
 		"ai_fleet": _enemy_ships,
 	})
 
+	# Fire narrator immediately (no await — plays audio whenever the server responds).
+	NetworkManager.ai_service.request_narrator_turn(ai_request)
+
 	var response := await NetworkManager.ai_service.request_admiral_turn(ai_request)
 	if response.success:
 		await _execute_ai_actions(response.data)
