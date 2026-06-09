@@ -5,6 +5,8 @@ var match_id: String = ""
 var mode: String = ""          # "pvp" | "pve" | "local"
 var phase: String = ""         # "coin" | "placement" | "combat" | "finished"
 var map_seed: int = 0
+## Locked when the coin-flip map is generated — battle must reuse this exact seed.
+var battlefield_map_seed: int = 0
 var map_index: int = 1
 var first_player_username: String = ""
 var you_go_first: bool = false
@@ -33,12 +35,59 @@ var local_guest_fleet_total_cost: int = 0
 var local_guest_display_name: String = ""
 var local_awaiting_guest_fleet: bool = false
 
+## Godot battle server handoff (from FastAPI POST /battle/handoff).
+var battle_host: String = ""
+var battle_port: int = 0
+var battle_token: String = ""
+var your_placements: Array = []
+var enemy_placements: Array = []
+var placement_source: String = ""
+var battle_connected: bool = false
+
+
+func apply_handoff(data: Dictionary) -> void:
+	match_id = str(data.get("match_id", match_id))
+	mode = str(data.get("mode", mode))
+	map_seed = int(data.get("map_seed", map_seed))
+	map_index = int(data.get("map_index", map_index))
+	first_player_username = str(data.get("first_player_username", first_player_username))
+	you_go_first = bool(data.get("you_go_first", you_go_first))
+	local_username = str(data.get("local_username", local_username))
+	if data.has("players"):
+		players = data.get("players", players)
+	phase = "combat"
+	is_active = match_id != ""
+	battle_host = str(data.get("battle_host", ""))
+	battle_port = int(data.get("battle_port", 0))
+	battle_token = str(data.get("battle_token", ""))
+
+
+func lock_battlefield_map() -> void:
+	if map_seed != 0:
+		battlefield_map_seed = map_seed
+
+
+func get_battlefield_map_seed() -> int:
+	if battlefield_map_seed != 0:
+		return battlefield_map_seed
+	return map_seed
+
+
+func apply_battle_state(data: Dictionary) -> void:
+	phase = str(data.get("phase", "placement"))
+	your_placements = data.get("your_placements", [])
+	enemy_placements = data.get("enemy_placements", [])
+	placement_source = str(data.get("placement_source", ""))
+	battle_connected = true
+
 
 func apply_snapshot(data: Dictionary) -> void:
 	match_id = str(data.get("match_id", ""))
 	mode = str(data.get("mode", ""))
 	phase = str(data.get("phase", ""))
-	map_seed = int(data.get("map_seed", 0))
+	var incoming_seed := int(data.get("map_seed", 0))
+	if incoming_seed != 0:
+		map_seed = incoming_seed
 	map_index = int(data.get("map_index", 1))
 	first_player_username = str(data.get("first_player_username", ""))
 	you_go_first = bool(data.get("you_go_first", false))
@@ -146,6 +195,7 @@ func clear() -> void:
 	mode = ""
 	phase = ""
 	map_seed = 0
+	battlefield_map_seed = 0
 	map_index = 1
 	first_player_username = ""
 	you_go_first = false
@@ -159,3 +209,10 @@ func clear() -> void:
 	red_display_name = "Red Fleet"
 	blue_display_name = "Blue Fleet"
 	clear_local_two_player_setup()
+	battle_host = ""
+	battle_port = 0
+	battle_token = ""
+	your_placements.clear()
+	enemy_placements.clear()
+	placement_source = ""
+	battle_connected = false

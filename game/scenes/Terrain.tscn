@@ -47,6 +47,7 @@ offset = Vector3(0, 0.08, 0)
 fractal_type = 2
 
 [node name="Terrain" type="MeshInstance3D" unique_id=1560107816]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1373625, -4.6833534, 2.2940807)
 mesh = SubResource("ArrayMesh_yd2fl")
 surface_material_override/0 = SubResource("ShaderMaterial_36psj")
 script = ExtResource("1_3iduy")

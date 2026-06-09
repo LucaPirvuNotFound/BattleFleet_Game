@@ -34,7 +34,7 @@ class DatabaseManager:
         try:
             # isolation_level=None → autocommit mode, matching the godot-sqlite
             # plugin behaviour where every db.query() is its own implicit transaction.
-            self._conn = sqlite3.connect(self._database_path, isolation_level=None)
+            self._conn = sqlite3.connect(self._database_path, isolation_level=None,  check_same_thread=False)
             # Return rows as sqlite3.Row so columns are accessible by name,
             # mirroring the Dictionary results that GDScript received.
             self._conn.row_factory = sqlite3.Row

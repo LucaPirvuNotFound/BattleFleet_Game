@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://dcyo04ls2npj5"]
 
-[ext_resource type="PackedScene" uid="uid://d1ghhmhl88rer" path="res://assets/models/gata/Destroyer/Destroyer.glb" id="1_elbyc"]
-[ext_resource type="Script" uid="uid://be028p0dkkfvx" path="res://scripts/Ship.gd" id="2_pqrs3"]
+[ext_resource type="PackedScene" uid="uid://d1ghhmhl88rer" path="res://assets/models/gata/Destroyer/Destroyer.glb" id="1_destroyer"]
 
-[node name="Destroyer" instance=ExtResource("1_elbyc")]
-script = ExtResource("2_pqrs3")
+[node name="Destroyer" instance=ExtResource("1_destroyer")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

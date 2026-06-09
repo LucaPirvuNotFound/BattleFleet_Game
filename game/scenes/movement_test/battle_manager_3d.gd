@@ -16,8 +16,6 @@ var _movement_controller: MovementController3D
 var _range_ring: RangeRing
 
 
-
-
 func _ready() -> void:
     _movement_controller = find_child("MovementController3D", true, false)
 
@@ -33,7 +31,6 @@ func _ready() -> void:
         _range_ring = range_ring_scene.instantiate() as RangeRing
         add_child(_range_ring)
 
-
     start_next_ship_turn()
 
 
@@ -47,7 +44,6 @@ func start_next_ship_turn() -> void:
     var ship = _current_ship()
     ship.reset_turn_actions()
 
-    # Jump ring instantly to the new ship
     if _range_ring:
         _range_ring.attach_to_ship(ship)
 

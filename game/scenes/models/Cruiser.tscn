@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://ncjwcovpl4bl"]
 
-[ext_resource type="PackedScene" uid="uid://g01kx1sjlafu" path="res://assets/models/gata/Cruiser/Cruiser.gltf" id="1_rxqdb"]
-[ext_resource type="Script" uid="uid://be028p0dkkfvx" path="res://scripts/Ship.gd" id="2_ikah8"]
+[ext_resource type="PackedScene" uid="uid://g01kx1sjlafu" path="res://assets/models/gata/Cruiser/Cruiser.gltf" id="1_cruiser"]
 
-[node name="Cruiser2" instance=ExtResource("1_rxqdb")]
-script = ExtResource("2_ikah8")
+[node name="Cruiser" instance=ExtResource("1_cruiser")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

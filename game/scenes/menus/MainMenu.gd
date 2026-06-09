@@ -53,7 +53,6 @@ var _email_regex: RegEx
 @onready var _queue_label: Label = %QueueLabel
 @onready var _cancel_queue_button: Button = %CancelQueueButton
 @onready var _weapon_buttons: VBoxContainer = %WeaponButtons
-@onready var _remove_ship_button: Button = %RemoveShipButton
 @onready var _weapon_panel_hint: Label = %WeaponPanelHint
 
 var _tree_root: TreeItem

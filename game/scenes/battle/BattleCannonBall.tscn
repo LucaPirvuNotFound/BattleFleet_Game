@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c8m4k2battleball"]
+
+[ext_resource type="Script" uid="uid://d1qsnlpd7fqji" path="res://scripts/battle/BattleCannonBall.gd" id="1_ball"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_ball"]
+radius = 0.25
+height = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
+radius = 0.2
+
+[node name="BattleCannonBall" type="RigidBody3D"]
+collision_layer = 8
+collision_mask = 7
+script = ExtResource("1_ball")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_ball")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_ball")

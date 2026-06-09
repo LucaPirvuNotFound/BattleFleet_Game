@@ -1,12 +1,25 @@
 from __future__ import annotations
 
+import os
 import random
 import uuid
 from typing import Any
 
 from fastapi import HTTPException, status
 
-from match_models import FleetPayload, GameMode, MatchPhase, MatchView, MatchPlayerView
+from match_models import (
+    BattleHandoffResponse,
+    BattlePlayerSession,
+    BattleSessionResponse,
+    FleetPayload,
+    GameMode,
+    MatchPhase,
+    MatchPlayerView,
+    MatchView,
+)
+
+BATTLE_SERVER_HOST = os.getenv("BATTLE_SERVER_HOST", "127.0.0.1")
+BATTLE_SERVER_PORT = int(os.getenv("BATTLE_SERVER_PORT", "7777"))
 
 # username -> queue entry
 queue_by_user: dict[str, dict[str, Any]] = {}
@@ -145,7 +158,7 @@ def create_instant_match(
         local_opponent = _new_player(guest_name, 1, guest_fleet)
         return _create_match(GameMode.LOCAL, [human, local_opponent])
 
-    ai = _new_player(AI_USERNAME, 1, FleetPayload.model_validate(AI_FLEET))
+    ai = _new_player(AI_USERNAME, 1, fleet)
     match = _create_match(GameMode.PVE, [human, ai])
     # AI auto-acknowledges coin flip for smoother solo flow
     ai_player = match["players"][1]
@@ -193,6 +206,76 @@ def submit_placement(match_id: str, username: str, placements: list[dict[str, An
 
     player["placement"] = placements
     return _to_match_view(match, username)
+
+
+def create_battle_handoff(match_id: str, username: str | None) -> BattleHandoffResponse:
+    match = _require_match(match_id)
+    if not all(player["coin_ack"] for player in match["players"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Coin flip not complete for all players",
+        )
+    if username and not _player_in_match(match, username) and match["mode"] != GameMode.LOCAL.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a player in this match")
+
+    battle_token = match.get("battle_token")
+    if not battle_token:
+        battle_token = str(uuid.uuid4())
+        match["battle_token"] = battle_token
+
+    match["phase"] = MatchPhase.COMBAT.value
+    session_players = _battle_session_players(match)
+    first_player = match.get("first_player_username")
+    you_go_first = username is not None and first_player == username
+
+    return BattleHandoffResponse(
+        match_id=match["match_id"],
+        battle_host=BATTLE_SERVER_HOST,
+        battle_port=BATTLE_SERVER_PORT,
+        battle_token=battle_token,
+        map_seed=match["map_seed"],
+        map_index=match["map_index"],
+        mode=GameMode(match["mode"]),
+        first_player_username=first_player,
+        you_go_first=you_go_first,
+        local_username=username,
+        players=session_players,
+    )
+
+
+def get_battle_session(match_id: str, battle_token: str) -> BattleSessionResponse:
+    match = _require_match(match_id)
+    if match.get("battle_token") != battle_token:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid battle token")
+    if match["phase"] != MatchPhase.COMBAT.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Match is not in combat phase",
+        )
+
+    return BattleSessionResponse(
+        match_id=match["match_id"],
+        battle_token=battle_token,
+        map_seed=match["map_seed"],
+        map_index=match["map_index"],
+        mode=GameMode(match["mode"]),
+        first_player_username=match.get("first_player_username"),
+        players=_battle_session_players(match),
+    )
+
+
+def _battle_session_players(match: dict[str, Any]) -> list[BattlePlayerSession]:
+    players: list[BattlePlayerSession] = []
+    for player in match["players"]:
+        players.append(
+            BattlePlayerSession(
+                username=player["username"],
+                slot=player["slot"],
+                fleet=FleetPayload.model_validate(player["fleet"]),
+                is_ai=player["username"] == AI_USERNAME,
+            )
+        )
+    return players
 
 
 def mark_ready(match_id: str, username: str) -> MatchView:
