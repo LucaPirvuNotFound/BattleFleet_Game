@@ -233,6 +233,8 @@ func _fit_camera_to_map() -> void:
 	_map_camera.rotation_degrees = Vector3(-90.0, 0.0, 0.0)
 	_map_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	_map_camera.size = ortho_size
+	if _terrain and _map_camera.has_method("setup"):
+		_map_camera.setup(_terrain.size)
 	_map_camera.current = true
 	_coin_camera.current = false
 
@@ -385,3 +387,10 @@ func _hide_all_overlays() -> void:
 	_coin_overlay.visible = false
 	_coin_hud_panel.visible = false
 	_matchmaking_overlay.visible = false
+
+
+func _process(_delta: float) -> void:
+	if not _water:
+		return
+	_water.position.x = _map_camera.global_position.x
+	_water.position.z = _map_camera.global_position.z
