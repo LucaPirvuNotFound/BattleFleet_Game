@@ -3,16 +3,16 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwcxdpx2r0gaa"
-path.s3tc="res://.godot/imported/Cruiser_Normal_Map.png-1a207fa8718106f6de023502db1d4674.s3tc.ctex"
+path.etc2="res://.godot/imported/Cruiser_Normal_Map.png-1a207fa8718106f6de023502db1d4674.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/models/gata/Cruiser/Cruiser_Normal_Map.png"
-dest_files=["res://.godot/imported/Cruiser_Normal_Map.png-1a207fa8718106f6de023502db1d4674.s3tc.ctex"]
+dest_files=["res://.godot/imported/Cruiser_Normal_Map.png-1a207fa8718106f6de023502db1d4674.etc2.ctex"]
 
 [params]
 
