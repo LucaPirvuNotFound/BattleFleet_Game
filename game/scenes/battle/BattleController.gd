@@ -33,6 +33,8 @@ const RANGE_RING_SCENE := preload("res://scenes/movement_test/RangeRing.tscn")
 @onready var _end_turn_button: Button = %EndTurnButton
 @onready var _movement_panel: BattleMovementController = $UI/BattleMovementPanel
 @onready var _movement_cancel_button: Button = $UI/BattleMovementPanel/VBoxContainer/CancelButton
+@onready var _fire_panel: BattleFireController = $UI/BattleFirePanel
+@onready var _fire_cancel_button: Button = $UI/BattleFirePanel/VBoxContainer/CancelButton
 
 var _terrain: MeshInstance3D
 var _fog_of_war: FogOfWar
@@ -45,6 +47,8 @@ var _turn_seconds_left: int = TURN_TIME_SEC
 var _turn_timer: Timer
 var _selected_ship_index: int = -1
 var _movement_ship_index: int = -1
+var _fire_ship_index: int = -1
+var _fire_weapon_name: String = ""
 var _round_number: int = 1
 var _is_ai_turn: bool = false
 var _left_click_start: Vector2 = Vector2.ZERO
@@ -57,6 +61,8 @@ func _ready() -> void:
 	_ship_action_menu.fire_requested.connect(_on_fire_requested)
 	_movement_panel.movement_confirmed.connect(_on_movement_confirmed)
 	_movement_cancel_button.pressed.connect(_on_movement_cancelled)
+	_fire_panel.fire_confirmed.connect(_on_fire_confirmed)
+	_fire_cancel_button.pressed.connect(_on_fire_cancelled)
 	_viewport_container.gui_input.connect(_on_viewport_gui_input)
 
 	_turn_timer = Timer.new()
@@ -406,6 +412,7 @@ func _on_end_turn_pressed() -> void:
 		return
 	_turn_timer.stop()
 	_on_movement_cancelled()
+	_on_fire_cancelled()
 	_deselect_ship()
 	_set_player_input_enabled(false)
 	await _run_ai_turn_stub()
@@ -487,6 +494,7 @@ func _begin_movement_for_ship(ship_index: int) -> void:
 	if not BattleTurnManager.can_move(ship):
 		return
 
+	_on_fire_cancelled()
 	_movement_ship_index = ship_index
 	_movement_panel.set_selected_ship(mover)
 	_movement_panel.visible = true
@@ -611,11 +619,77 @@ func _on_fire_requested(ship_index: int, weapon_name: String) -> void:
 	if _is_ai_turn:
 		return
 	var ship := _get_player_ship(ship_index)
-	if ship.is_empty() or not BattleTurnManager.mark_fired(ship, weapon_name):
+	if ship.is_empty() or not BattleTurnManager.can_fire_weapon(ship, weapon_name):
 		return
-	print("[Battle] Fire %s from ship %d (stub)" % [weapon_name, ship_index])
-	_fleet_panel.update_ship_status(ship_index, ship)
+
+	_on_movement_cancelled()
 	_ship_action_menu.hide_menu()
+	_fire_ship_index = ship_index
+	_fire_weapon_name = weapon_name
+	_fire_panel.configure_weapon(weapon_name)
+	_fire_panel.visible = true
+
+
+func _on_fire_confirmed(angle: float, distance: float) -> void:
+	if _fire_ship_index < 0 or _fire_weapon_name.is_empty() or _is_ai_turn:
+		return
+	var ship := _get_player_ship(_fire_ship_index)
+	if ship.is_empty() or not BattleTurnManager.can_fire_weapon(ship, _fire_weapon_name):
+		_on_fire_cancelled()
+		return
+
+	var marker: Node3D = ship.get("marker")
+	if marker == null:
+		_on_fire_cancelled()
+		return
+
+	if not BattleTurnManager.mark_fired(ship, _fire_weapon_name, angle, distance):
+		_on_fire_cancelled()
+		return
+
+	var weapon_name := _fire_weapon_name
+	var ship_index := _fire_ship_index
+	BattleProjectileLauncher.fire(
+		marker,
+		weapon_name,
+		angle,
+		distance,
+		func(impact_pos: Vector3, fired_weapon: String, _hit_body: Object) -> void:
+			_on_weapon_impact(impact_pos, fired_weapon, ship_index, "player")
+	)
+
+	_fleet_panel.update_ship_status(ship_index, ship)
+	_on_fire_cancelled()
+
+
+func _on_fire_cancelled() -> void:
+	_fire_panel.visible = false
+	_fire_ship_index = -1
+	_fire_weapon_name = ""
+
+
+func _on_weapon_impact(
+	impact_pos: Vector3,
+	weapon_name: String,
+	firer_ship_index: int,
+	firer_team: String
+) -> void:
+	var stats := BattleTurnManager.get_weapon_stats(weapon_name)
+	var damage: int = int(stats.get("damage", 20))
+	var aoe_radius: float = float(stats.get("aoe_radius", 16.0))
+
+	for team: String in ["player", "enemy"]:
+		var ships: Array = _player_ships if team == "player" else _enemy_ships
+		for ship in ships:
+			if not ship is Dictionary:
+				continue
+			var target_index := int(ship.get("ship_index", -1))
+			if team == firer_team and target_index == firer_ship_index:
+				continue
+			var pos: Vector3 = ship.get("world_pos", Vector3.ZERO)
+			var dist := Vector2(impact_pos.x - pos.x, impact_pos.z - pos.z).length()
+			if dist <= aoe_radius:
+				_apply_ship_damage(team, target_index, damage, weapon_name)
 
 
 func _on_camera_zoom_changed(zoom_out_ratio: float) -> void:

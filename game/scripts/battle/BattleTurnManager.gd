@@ -8,11 +8,47 @@ const MOVE_ANGLE_MIN := -180.0
 const MOVE_ANGLE_MAX := 180.0
 
 const WEAPON_STATS: Dictionary = {
-	"Light Cannon": {"max_range": 200.0, "min_range": 0.0},
-	"Anti-Air": {"max_range": 150.0, "min_range": 0.0},
-	"Torpedoes": {"max_range": 120.0, "min_range": 0.0},
-	"Heavy Battery": {"max_range": 300.0, "min_range": 0.0},
+	"Light Cannon": {
+		"max_range": 200.0,
+		"min_range": 20.0,
+		"damage": 25,
+		"aoe_radius": 18.0,
+	},
+	"Anti-Air": {
+		"max_range": 150.0,
+		"min_range": 10.0,
+		"damage": 20,
+		"aoe_radius": 14.0,
+	},
+	"Torpedoes": {
+		"max_range": 120.0,
+		"min_range": 15.0,
+		"damage": 40,
+		"aoe_radius": 22.0,
+	},
+	"Heavy Battery": {
+		"max_range": 300.0,
+		"min_range": 40.0,
+		"damage": 55,
+		"aoe_radius": 28.0,
+	},
 }
+
+
+static func get_weapon_stats(weapon_name: String) -> Dictionary:
+	var defaults := {
+		"max_range": 200.0,
+		"min_range": 0.0,
+		"damage": 20,
+		"aoe_radius": 16.0,
+	}
+	var stats: Dictionary = WEAPON_STATS.get(weapon_name, defaults)
+	return {
+		"max_range": float(stats.get("max_range", defaults.max_range)),
+		"min_range": float(stats.get("min_range", defaults.min_range)),
+		"damage": int(stats.get("damage", defaults.damage)),
+		"aoe_radius": float(stats.get("aoe_radius", defaults.aoe_radius)),
+	}
 
 
 static func init_ship_round_state(ship: Dictionary) -> void:
@@ -63,10 +99,9 @@ static func mark_fired(ship: Dictionary, weapon_name: String, angle: float = 0.0
 	var action := {
 		"type": "fire",
 		"weapon": weapon_name,
+		"angle": angle,
+		"distance": distance,
 	}
-	if angle != 0.0 or distance != 0.0:
-		action["angle"] = angle
-		action["distance"] = distance
 	actions.append(action)
 	ship["round_actions"] = actions
 	return true
@@ -176,11 +211,13 @@ static func serialize_ship(ship: Dictionary) -> Dictionary:
 	var weapon_entries: Array = []
 	for weapon_name in weapons:
 		var wname := str(weapon_name)
-		var stats: Dictionary = WEAPON_STATS.get(wname, {"max_range": 200.0, "min_range": 0.0})
+		var stats := get_weapon_stats(wname)
 		weapon_entries.append({
 			"name": wname,
 			"max_range": stats.get("max_range", 200.0),
 			"min_range": stats.get("min_range", 0.0),
+			"damage": stats.get("damage", 20),
+			"aoe_radius": stats.get("aoe_radius", 16.0),
 			"available": remaining.has(wname),
 		})
 
@@ -207,10 +244,12 @@ static func serialize_ship(ship: Dictionary) -> Dictionary:
 static func _serialize_weapon_catalog() -> Array:
 	var catalog: Array = []
 	for weapon_name in WEAPON_STATS.keys():
-		var stats: Dictionary = WEAPON_STATS[weapon_name]
+		var stats := get_weapon_stats(weapon_name)
 		catalog.append({
 			"name": weapon_name,
 			"max_range": stats.get("max_range", 0.0),
 			"min_range": stats.get("min_range", 0.0),
+			"damage": stats.get("damage", 0),
+			"aoe_radius": stats.get("aoe_radius", 0.0),
 		})
 	return catalog

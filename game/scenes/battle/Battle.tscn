@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/battle/BattleShipActionMenu.gd" id="5_actions"]
 [ext_resource type="Script" path="res://scripts/battle/BattleHudPanel.gd" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/battle/BattleMovementPanel.tscn" id="7_move"]
+[ext_resource type="PackedScene" path="res://scenes/battle/BattleFirePanel.tscn" id="8_fire"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_battle"]
 sky_top_color = Color(0.28, 0.45, 0.7, 1)
@@ -178,6 +179,8 @@ layout_mode = 2
 theme_override_constants/separation = 4
 
 [node name="BattleMovementPanel" parent="UI" instance=ExtResource("7_move")]
+
+[node name="BattleFirePanel" parent="UI" instance=ExtResource("8_fire")]
 
 [node name="RoundPanel" type="PanelContainer" parent="UI"]
 unique_name_in_owner = true
