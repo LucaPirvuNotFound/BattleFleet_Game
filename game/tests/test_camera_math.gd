@@ -7,7 +7,7 @@ func test_zoom_clamps_to_min() -> void:
 	var min_zoom := 50.0
 	var max_zoom := 2000.0
 	cam.size = clamp(cam.size / 1.15, min_zoom, max_zoom)
-	assert_eq(cam.size, 2000.0 / 1.15, "zoom divides by factor")
+	assert_almost_eq(cam.size, 2000.0 / 1.15, 0.001, "zoom divides by factor")
 	cam.size = 10.0
 	cam.size = clamp(cam.size, min_zoom, max_zoom)
 	assert_eq(cam.size, min_zoom, "zoom clamps to min")
