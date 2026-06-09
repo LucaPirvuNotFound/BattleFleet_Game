@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://d0xumgqij7o1s" path="res://scenes/movement_test/battle_manager_3d.gd" id="2_4cs1n"]
 [ext_resource type="Script" uid="uid://cbcxlevgx3mng" path="res://scenes/movement_test/movement_controller_3d.gd" id="2_wkfhq"]
 [ext_resource type="PackedScene" uid="uid://dixy27qrlsrd0" path="res://scenes/movement_test/naval_ship_3d.tscn" id="3_4cs1n"]
+[ext_resource type="PackedScene" uid="uid://1br5leac2kwi" path="res://scenes/movement_test/range_ring.tscn" id="4_kfam3"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4cs1n"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -46,6 +47,7 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 7
 [node name="BattleManager3D" type="Node3D" parent="." unique_id=1494070977 node_paths=PackedStringArray("ships")]
 script = ExtResource("2_4cs1n")
 ships = [NodePath("Ships/NavalShip3D3"), NodePath("Ships/NavalShip3D2"), NodePath("Ships/NavalShip3D")]
+range_ring_scene = ExtResource("4_kfam3")
 
 [node name="UI" type="CanvasLayer" parent="BattleManager3D" unique_id=1942437895]
 
