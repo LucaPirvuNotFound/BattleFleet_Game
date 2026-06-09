@@ -16,8 +16,8 @@ import math
 import pytest
 from models import BattleRecord, Player, PlayerStats
 from database_manager import DatabaseManager
-from player_repository import PlayerRepository
-from player_stats_repository import PlayerStatsRepository
+from database.player_repository import PlayerRepository
+from database.player_stats_repository import PlayerStatsRepository
 
 
 # ─────────────────────────────────────────────────────────────

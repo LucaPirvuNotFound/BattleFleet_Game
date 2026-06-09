@@ -6,8 +6,10 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from .database_manager import DatabaseManager
-from .models import Player
+# from .database_manager import DatabaseManager
+# from .models import Player
+from database.database_manager import DatabaseManager
+from database.models import Player
 
 logger = logging.getLogger(__name__)
 

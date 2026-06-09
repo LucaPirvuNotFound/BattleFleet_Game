@@ -15,8 +15,8 @@ import time
 import math
 from models import BattleRecord, Player, PlayerStats
 from database_manager import DatabaseManager
-from player_repository import PlayerRepository
-from player_stats_repository import PlayerStatsRepository, calculate_fleet_level
+from database.player_repository import PlayerRepository
+from database.player_stats_repository import PlayerStatsRepository, calculate_fleet_level
 
 TEST_DB = "BattleFleetGame_Test.db"
 
