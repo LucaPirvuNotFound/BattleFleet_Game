@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dcyo04ls2npj5"]
 
 [ext_resource type="PackedScene" uid="uid://cbn4m2iovi8kd" path="res://assets/models/WIP/Destroyer.blend" id="1_elbyc"]
+[ext_resource type="Script" uid="uid://be028p0dkkfvx" path="res://scripts/Ship.gd" id="2_pqrs3"]
 
 [node name="Destroyer" unique_id=1745249835 instance=ExtResource("1_elbyc")]
+script = ExtResource("2_pqrs3")
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 
 [node name="BSurfaceMesh" parent="." index="0" unique_id=1420133572]

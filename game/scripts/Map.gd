@@ -1,17 +1,29 @@
+@tool
 extends Node3D
 
 @export var resolution: float = 512.0
 @export var vision_circle_scene: PackedScene
 
-@onready var sub_viewport: SubViewport = $SubViewport
-@onready var fog_plane: MeshInstance3D = $FogPlane
+@export var sub_viewport: SubViewport
+@export var fog_plane: MeshInstance3D
 
 var map_size: float = 2048.0
 var active_ships: Dictionary = {}
 
 func _ready() -> void:
+	add_to_group("map")
+
 	if %Terrain:
 		map_size = %Terrain.size
+
+	# Ensure the SubViewport is properly sized and updating
+	sub_viewport.size = Vector2i(int(resolution), int(resolution))
+	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+
+	# Ensure the background ColorRect matches the SubViewport size
+	var color_rect = sub_viewport.get_node_or_null("ColorRect")
+	if color_rect:
+		color_rect.size = Vector2(resolution, resolution)
 
 	var fog_material: ShaderMaterial = fog_plane.get_active_material(0)
 	if fog_material:
@@ -29,9 +41,9 @@ func register_ship(ship: Node3D) -> void:
 	if not vision_circle_scene:
 		return
 
-	var sprite: Sprite2D = vision_circle_scene.instantiate()
-	sub_viewport.add_child(sprite)
-	active_ships[ship] = sprite
+	var circle: Node2D = vision_circle_scene.instantiate()
+	sub_viewport.add_child(circle)
+	active_ships[ship] = circle
 
 	ship.tree_exiting.connect(func():
 		if active_ships.has(ship):
