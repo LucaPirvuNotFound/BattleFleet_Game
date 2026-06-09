@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers.auth import router as auth_router
+from routers.matchmaking import router as matchmaking_router
+from routers.matches import router as matches_router
+from routers.ai import router as ai_router
 
 app = FastAPI(title="BattleFleet API", version="0.1.0")
 
@@ -14,3 +17,6 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(matchmaking_router)
+app.include_router(matches_router)
+app.include_router(ai_router)
