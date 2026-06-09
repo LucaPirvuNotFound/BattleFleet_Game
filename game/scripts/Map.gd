@@ -38,9 +38,6 @@ func _follow_camera() -> void:
 	if water_plane:
 		water_plane.position.x = cam.global_position.x
 		water_plane.position.z = cam.global_position.z
-	if fog_plane:
-		fog_plane.position.x = cam.global_position.x
-		fog_plane.position.z = cam.global_position.z
 
 
 func _process(_delta: float) -> void:
