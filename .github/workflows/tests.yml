@@ -1,0 +1,66 @@
+# .github/workflows/tests.yml
+#
+# GitHub Actions — rulează automat testele la fiecare push sau Pull Request.
+#
+# Cum funcționează:
+#   1. GitHub creează o mașină virtuală Linux fresh
+#   2. Descarcă codul din repo
+#   3. Instalează Python + dependințele
+#   4. Rulează pytest
+#   5. Afișează rezultatele (✓ / ✗) direct în PR sau pe pagina de commit
+
+name: Run Tests
+
+# ── Când se declanșează ──────────────────────────────────────
+on:
+  push:
+    branches: ["**"]          # orice branch la push
+  pull_request:
+    branches: ["**"]          # orice PR spre orice branch
+
+# ── Job-uri ─────────────────────────────────────────────────
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+
+    # Testează pe mai multe versiuni Python (opțional — poți lăsa doar una)
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      # 1. Descarcă codul din repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setează versiunea Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"          # cache pip pentru build-uri mai rapide
+
+      # 3. Instalează dependințele proiectului + pytest
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          # Dacă ai un requirements.txt pentru proiect, decomentează:
+          # pip install -r requirements.txt
+
+      # 4. Rulează testele
+      #    --tb=short   = afișează erori scurte (nu stacktrace complet)
+      #    --cov        = calculează code coverage (% din cod testat)
+      #    -v           = verbose (afișează numele fiecărui test)
+      - name: Run tests
+        run: |
+          pytest tests/ -v --tb=short --cov=. --cov-report=term-missing
+
+      # 5. (Opțional) Încarcă raportul de coverage pe Codecov
+      #    Necesită să te înregistrezi pe codecov.io și să adaugi
+      #    CODECOV_TOKEN în Settings → Secrets → Actions
+      # - name: Upload coverage report
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
