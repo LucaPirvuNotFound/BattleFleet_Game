@@ -3,12 +3,9 @@ class_name AiService
 
 var api_client: ApiClient
 
-## Server should respond within ~12s (Ollama) or fallback; don't wait 90s on a hung Pi.
+## Server responds in ~12s (Ollama) or immediately (fallback); 20s gives enough headroom.
 const ADMIRAL_TURN_TIMEOUT_SEC := 20.0
-const DEBUG_JSON_MAX_CHARS := 12000
-
-## Server should respond within ~12s (Ollama) or fallback; don't wait 90s on a hung Pi.
-const ADMIRAL_TURN_TIMEOUT_SEC := 20.0
+const NARRATOR_TURN_TIMEOUT_SEC := 30.0  # gTTS adds a short external HTTP call
 const DEBUG_JSON_MAX_CHARS := 12000
 
 var _admiral_http: HTTPRequest
@@ -21,12 +18,12 @@ var _admiral_resolve: Callable
 
 func _ready() -> void:
 	_admiral_http = HTTPRequest.new()
-	_admiral_http.timeout = 300.0
+	_admiral_http.timeout = ADMIRAL_TURN_TIMEOUT_SEC
 	add_child(_admiral_http)
 	_admiral_http.request_completed.connect(_on_admiral_completed)
 
 	_narrator_http = HTTPRequest.new()
-	_narrator_http.timeout = 300.0
+	_narrator_http.timeout = NARRATOR_TURN_TIMEOUT_SEC
 	add_child(_narrator_http)
 	_narrator_http.request_completed.connect(_on_narrator_completed)
 

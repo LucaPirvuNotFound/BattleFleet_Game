@@ -1,11 +1,47 @@
 import json
 import math
+import os
+
 import httpx
 from gtts import gTTS
 
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434/api/generate")
 OLLAMA_TIMEOUT_SEC = float(os.getenv("OLLAMA_TIMEOUT_SEC", "12"))
 SKIP_OLLAMA = os.getenv("SKIP_OLLAMA", "").lower() in ("1", "true", "yes")
+
+
+def _tactical_summary(ctx: dict) -> str:
+    """Compact tactical snapshot — keeps the prompt under ~200 tokens."""
+
+    def _slim_ship(s: dict) -> dict:
+        pos = s.get("position") or {}
+        raw_weapons = s.get("weapons", [])
+        weapons = []
+        for w in raw_weapons:
+            if isinstance(w, str):
+                weapons.append(w)
+            elif isinstance(w, dict) and w.get("available", True):
+                weapons.append(w.get("name", "?"))
+        return {
+            "i": s.get("ship_index", "?"),
+            "hp": s.get("hp", "?"),
+            "x": round(float(pos.get("x", 0)), 1),
+            "z": round(float(pos.get("z", 0)), 1),
+            "hdg": round(float(pos.get("heading_degrees", 0)), 1),
+            "weapons": weapons,
+        }
+
+    ai_ships = [_slim_ship(s) for s in ctx.get("ai_fleet", [])]
+    vis_human = [_slim_ship(s) for s in ctx.get("visible_human_ships", [])]
+    return json.dumps(
+        {
+            "match_id": ctx.get("match_id", ""),
+            "round": ctx.get("round", 1),
+            "ai": ai_ships,
+            "enemy": vis_human,
+        },
+        separators=(",", ":"),
+    )
 
 
 def _ship_xz(position: dict) -> tuple[float, float]:
@@ -224,7 +260,7 @@ async def get_narrator_commentary(
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(OLLAMA_API_URL, json=payload, timeout=_TIMEOUT)
+        response = await client.post(OLLAMA_API_URL, json=payload, timeout=OLLAMA_TIMEOUT_SEC)
         response.raise_for_status()
         commentary_text = response.json()["response"].strip()
 
