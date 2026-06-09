@@ -413,6 +413,7 @@ func _on_end_turn_pressed() -> void:
 	_turn_timer.stop()
 	_on_movement_cancelled()
 	_on_fire_cancelled()
+	_clear_impact_markers()
 	_deselect_ship()
 	_set_player_input_enabled(false)
 	await _run_ai_turn_stub()
@@ -666,6 +667,12 @@ func _on_fire_cancelled() -> void:
 	_fire_panel.visible = false
 	_fire_ship_index = -1
 	_fire_weapon_name = ""
+
+
+func _clear_impact_markers() -> void:
+	for marker in get_tree().get_nodes_in_group(BattleCannonBall.IMPACT_MARKER_GROUP):
+		if is_instance_valid(marker):
+			marker.queue_free()
 
 
 func _on_weapon_impact(
