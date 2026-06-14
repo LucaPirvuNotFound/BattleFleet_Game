@@ -4,7 +4,18 @@ game/export_credentials.cfg
 
 game/bin/*.pck
 game/bin/*.x86_64
+game/bin/*.arm64
+game/bin/*.zip
+game/bin/godot
 game/bin/*.exe
 
 # Blender
 game/assets/models/.blend1
+
+# AI and TTS Artifacts
+*.mp3
+*.wav
+*.gguf
+models/
+
+actions-runner/

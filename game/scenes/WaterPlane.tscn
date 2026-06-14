@@ -8,9 +8,12 @@ subdivide_depth = 512
 orientation = 1
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_p2yne"]
+noise_type = 3
 fractal_type = 2
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2sdci"]
+width = 1024
+height = 1024
 noise = SubResource("FastNoiseLite_p2yne")
 seamless = true
 as_normal_map = true
@@ -18,17 +21,23 @@ seamless_blend_skirt = 0.217
 bump_strength = 6.9
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_evp2s"]
+noise_type = 3
 fractal_type = 2
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_c1ees"]
+width = 1024
+height = 1024
 noise = SubResource("FastNoiseLite_evp2s")
 seamless = true
 as_normal_map = true
 bump_strength = 16.4
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_2sdci"]
+frequency = 0.004
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_abwsr"]
+width = 1024
+height = 1024
 noise = SubResource("FastNoiseLite_2sdci")
 seamless = true
 
@@ -45,12 +54,11 @@ shader_parameter/noise_scale = 100.0
 shader_parameter/height_scale = 1.795
 shader_parameter/wave_dir1 = Vector2(2, 0)
 shader_parameter/wave_dir2 = Vector2(0, 1)
-shader_parameter/time_scale = 0.025
+shader_parameter/time_scale = 0.01499999966472
 shader_parameter/edge_scale = 0.67
-shader_parameter/near = 0.1
-shader_parameter/far = 10.0
 shader_parameter/edge_color = Color(1, 1, 1, 1)
 
 [node name="WaterPlane" type="MeshInstance3D" unique_id=432126146]
+transform = Transform3D(38.197742, 0, 0, 0, 1, 0, 0, 0, 26.828587, -0.0030078888, 0.028618813, -0.021671772)
 mesh = SubResource("QuadMesh_nsty4")
 surface_material_override/0 = SubResource("ShaderMaterial_m6j1k")

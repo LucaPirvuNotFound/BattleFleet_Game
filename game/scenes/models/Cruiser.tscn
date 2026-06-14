@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ncjwcovpl4bl"]
+
+[ext_resource type="PackedScene" uid="uid://g01kx1sjlafu" path="res://assets/models/gata/Cruiser/Cruiser.gltf" id="1_cruiser"]
+
+[node name="Cruiser" instance=ExtResource("1_cruiser")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

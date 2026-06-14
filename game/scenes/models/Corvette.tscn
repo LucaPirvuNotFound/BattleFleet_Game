@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://5gceoldkf58f"]
+
+[ext_resource type="PackedScene" uid="uid://boojvieqbna5x" path="res://assets/models/gata/Corvette/Corvette.gltf" id="1_corvette"]
+
+[node name="Corvette" instance=ExtResource("1_corvette")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

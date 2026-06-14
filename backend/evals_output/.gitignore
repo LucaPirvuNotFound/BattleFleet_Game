@@ -1,0 +1,9 @@
+# Evaluation results (generated, not tracked)
+evaluation_results.json
+*.log
+
+# Keep these files tracked
+!eval_admiral.py
+!README.md
+!QUICK_START.md
+!.gitignore

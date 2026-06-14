@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b3k1topqbhwti"]
+
+[ext_resource type="Script" uid="uid://cp0eu0vy8piee" path="res://scenes/movement_test/projectile.gd" id="1_tgyyd"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_tgcoc"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_tgyyd"]
+radius = 0.1
+
+[node name="CannonBall" type="RigidBody3D" unique_id=1580150376]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_tgyyd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=232992684]
+mesh = SubResource("SphereMesh_tgcoc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1623201964]
+shape = SubResource("SphereShape3D_tgyyd")

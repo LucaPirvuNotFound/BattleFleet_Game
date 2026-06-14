@@ -1,0 +1,567 @@
+[
+  {
+    "id": "scenario_1_close_target_direct_ahead",
+    "description": "Single AI corvette vs single human corvette, target directly ahead at close range",
+    "match_id": "test-match-001",
+    "round": 1,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "AI_Corvette_1",
+        "hp": 1750,
+        "max_hp": 1750,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "Human_Corvette_1",
+        "hp": 1500,
+        "max_hp": 1750,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 80.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_2_medium_distance_angled",
+    "description": "Cruiser vs Destroyer, target at medium range and 45 degree angle",
+    "match_id": "test-match-002",
+    "round": 3,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "AI_Cruiser_1",
+        "hp": 8500,
+        "max_hp": 9000,
+        "position": {
+          "x": -100.0,
+          "y": 0.0,
+          "z": -100.0,
+          "heading_degrees": 45.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Light Turret", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Destroyer",
+        "display_name": "Human_Destroyer_1",
+        "hp": 3500,
+        "max_hp": 4000,
+        "position": {
+          "x": 50.0,
+          "y": 0.0,
+          "z": 80.0,
+          "heading_degrees": 270.0,
+          "rotation": 3
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_3_far_target",
+    "description": "Battleship vs Cruiser, target at far range (max range)",
+    "match_id": "test-match-003",
+    "round": 5,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Battleship",
+        "display_name": "AI_Battleship_1",
+        "hp": 11000,
+        "max_hp": 12000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 90.0,
+          "rotation": 1
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Heavy Battery", "max_range": 350.0, "min_range": 0.0, "damage": 60, "aoe_radius": 32.0, "available": true},
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "Human_Cruiser_1",
+        "hp": 8000,
+        "max_hp": 9000,
+        "position": {
+          "x": 320.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 270.0,
+          "rotation": 3
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_4_multiple_targets",
+    "description": "Single destroyer with 2 visible enemy ships at different ranges",
+    "match_id": "test-match-004",
+    "round": 2,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Destroyer",
+        "display_name": "AI_Destroyer_1",
+        "hp": 3800,
+        "max_hp": 4000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Light Turret", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": false}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "Human_Corvette_1",
+        "hp": 1000,
+        "max_hp": 1750,
+        "position": {
+          "x": 150.0,
+          "y": 0.0,
+          "z": 120.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      },
+      {
+        "ship_index": 1,
+        "name": "Torpedo Boat",
+        "display_name": "Human_TorpedoBoat_1",
+        "hp": 250,
+        "max_hp": 300,
+        "position": {
+          "x": -80.0,
+          "y": 0.0,
+          "z": 200.0,
+          "heading_degrees": 45.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_5_low_hp_target",
+    "description": "Corvette vs low-HP torpedo boat (high priority target)",
+    "match_id": "test-match-005",
+    "round": 1,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "AI_Corvette_1",
+        "hp": 1750,
+        "max_hp": 1750,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Torpedo Boat",
+        "display_name": "Human_TorpedoBoat_1",
+        "hp": 50,
+        "max_hp": 300,
+        "position": {
+          "x": 120.0,
+          "y": 0.0,
+          "z": 90.0,
+          "heading_degrees": 270.0,
+          "rotation": 3
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_6_rear_enemy",
+    "description": "Destroyer vs enemy at rear (180 degree angle)",
+    "match_id": "test-match-006",
+    "round": 4,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Destroyer",
+        "display_name": "AI_Destroyer_1",
+        "hp": 3500,
+        "max_hp": 4000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "Human_Cruiser_1",
+        "hp": 8000,
+        "max_hp": 9000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -180.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_7_side_attack",
+    "description": "Battleship vs destroyer on its starboard side (90 degree angle)",
+    "match_id": "test-match-007",
+    "round": 2,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Battleship",
+        "display_name": "AI_Battleship_1",
+        "hp": 11500,
+        "max_hp": 12000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Heavy Battery", "max_range": 350.0, "min_range": 0.0, "damage": 60, "aoe_radius": 32.0, "available": true},
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Light Turret", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Destroyer",
+        "display_name": "Human_Destroyer_1",
+        "hp": 3000,
+        "max_hp": 4000,
+        "position": {
+          "x": 200.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_8_out_of_range",
+    "description": "Light Cannon corvette vs far cruiser (target just out of weapon range)",
+    "match_id": "test-match-008",
+    "round": 1,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "AI_Corvette_1",
+        "hp": 1750,
+        "max_hp": 1750,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "Human_Cruiser_1",
+        "hp": 8000,
+        "max_hp": 9000,
+        "position": {
+          "x": 250.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_9_multiple_ai_ships",
+    "description": "Two AI ships (corvette and destroyer) vs one enemy cruiser",
+    "match_id": "test-match-009",
+    "round": 3,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "AI_Corvette_1",
+        "hp": 1500,
+        "max_hp": 1750,
+        "position": {
+          "x": -50.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 0.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Light Cannon", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      },
+      {
+        "ship_index": 1,
+        "name": "Destroyer",
+        "display_name": "AI_Destroyer_1",
+        "hp": 3500,
+        "max_hp": 4000,
+        "position": {
+          "x": 50.0,
+          "y": 0.0,
+          "z": 50.0,
+          "heading_degrees": 45.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Torpedo Launcher", "max_range": 300.0, "min_range": 50.0, "damage": 80, "aoe_radius": 32.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Cruiser",
+        "display_name": "Human_Cruiser_1",
+        "hp": 7000,
+        "max_hp": 9000,
+        "position": {
+          "x": 100.0,
+          "y": 0.0,
+          "z": 150.0,
+          "heading_degrees": 270.0,
+          "rotation": 3
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  },
+  {
+    "id": "scenario_10_complex_tactical",
+    "description": "Complex scenario: low hp battleship vs multiple enemies, should choose strategy carefully",
+    "match_id": "test-match-010",
+    "round": 6,
+    "ai_fleet": [
+      {
+        "ship_index": 0,
+        "name": "Battleship",
+        "display_name": "AI_Battleship_1",
+        "hp": 2000,
+        "max_hp": 12000,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_degrees": 90.0,
+          "rotation": 1
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [
+          {"name": "Heavy Battery", "max_range": 350.0, "min_range": 0.0, "damage": 60, "aoe_radius": 32.0, "available": false},
+          {"name": "Medium Turret", "max_range": 250.0, "min_range": 0.0, "damage": 40, "aoe_radius": 24.0, "available": true},
+          {"name": "Light Turret", "max_range": 200.0, "min_range": 0.0, "damage": 20, "aoe_radius": 16.0, "available": true}
+        ],
+        "actions_this_round": []
+      }
+    ],
+    "visible_human_ships": [
+      {
+        "ship_index": 0,
+        "name": "Corvette",
+        "display_name": "Human_Corvette_1",
+        "hp": 1200,
+        "max_hp": 1750,
+        "position": {
+          "x": 80.0,
+          "y": 0.0,
+          "z": 120.0,
+          "heading_degrees": 180.0,
+          "rotation": 2
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      },
+      {
+        "ship_index": 1,
+        "name": "Destroyer",
+        "display_name": "Human_Destroyer_1",
+        "hp": 3000,
+        "max_hp": 4000,
+        "position": {
+          "x": -150.0,
+          "y": 0.0,
+          "z": 80.0,
+          "heading_degrees": 45.0,
+          "rotation": 0
+        },
+        "can_move": true,
+        "can_fire": true,
+        "weapons": [],
+        "actions_this_round": []
+      }
+    ],
+    "rules": {"max_move_distance": 90.0, "min_move_distance": 5.0}
+  }
+]

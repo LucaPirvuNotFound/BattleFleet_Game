@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://battlefleet_server_main"]
+
+[ext_resource type="Script" path="res://scripts/battle/BattleServerMain.gd" id="1_main"]
+
+[node name="BattleServerMain" type="Node"]
+script = ExtResource("1_main")
