@@ -1,0 +1,50 @@
+name: CI/CD Pipeline pentru Raspberry Pi
+
+# Pipeline-ul rulează automat la fiecare push pe branch-ul main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 1. Partea de CI (Integrare Continuă - rulează în Cloud)
+  test-in-cloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descarcă codul sursă
+        uses: actions/checkout@v4
+      
+      # (AICI ADAUGI PAȘII DE TESTARE, EX: Python)
+      - name: Setează Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Rulează testele automate
+        run: |
+          echo "Aici instalăm dependințele și rulăm testele (ex: pytest)"
+          pip install -r requirements.txt
+          pytest
+
+  # 2. Partea de CD (Implementare Continuă - rulează pe Raspberry Pi)
+  deploy-to-pi:
+    # Condiție: Rulează doar DACĂ testele de mai sus au trecut cu succes
+    needs: test-in-cloud
+    # Eticheta 'self-hosted' îi spune GitHub-ului să trimită comanda către Raspberry Pi
+    runs-on: self-hosted
+    
+    steps:
+      - name: Actualizează codul și restartează aplicația
+        run: |
+          # 1. Navigăm în folderul unde aveți proiectul pe Pi
+          cd /home/lucap/BattleFleet_Game/backend
+          
+          # 2. Tragem cel mai nou cod de pe main
+          git pull origin main
+
+          docker compose up -d --build
+          
+          # 3. Restartăm aplicația (Comanda depinde de cum o rulați)
+          # Exemplu dacă folosiți systemd: sudo systemctl restart aplicatia-mea
+          # Exemplu dacă folosiți PM2 pt Node.js: pm2 restart aplicatia-mea
+          echo "Aplicația a fost actualizată și restartată cu succes!"

@@ -18,3 +18,4 @@ game/assets/models/.blend1
 *.gguf
 models/
 
+actions-runner/
