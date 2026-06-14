@@ -5,6 +5,9 @@
 ## 📖 Project Overview
 *Neural Armada* is a scaled-down tactical naval game inspired by *Battle Fleet 2*. The core focus of this repository is not just the game itself, but the **AI-driven development process**. The game features two strictly locally-run AI agents that actively influence the gameplay loop.
 
+## 🎬 Demo Video
+Watch the gameplay demo: [docs/demo_battlefeet.mp4](docs/demo_battlefeet.mp4)
+
 ---
 
 ## 🤖 In-Game AI Agents
